@@ -218,6 +218,7 @@ class DawnAudioEngine {
   }
 
   async setKolkataStation(index) {
+    this.init();
     if (index < 0 || index >= KOLKATA_RADIO_STATIONS.length) return;
     this.currentKolkataStationIndex = index;
     const station = this.getCurrentKolkataStation();
@@ -228,7 +229,8 @@ class DawnAudioEngine {
       this.notifyListeners();
 
       if (this.adapter) {
-        await this.adapter.load(station.streamUrl, "hls", this.isPlaying);
+        await this.adapter.load(station.streamUrl, "hls", true);
+        this.isPlaying = true;
       }
       this.updateMediaSessionMetadata();
       this.notifyListeners();
@@ -236,12 +238,14 @@ class DawnAudioEngine {
   }
 
   async nextKolkataStation() {
+    this.init();
     const nextIdx =
       (this.currentKolkataStationIndex + 1) % KOLKATA_RADIO_STATIONS.length;
     await this.setKolkataStation(nextIdx);
   }
 
   async prevKolkataStation() {
+    this.init();
     const prevIdx =
       (this.currentKolkataStationIndex - 1 + KOLKATA_RADIO_STATIONS.length) %
       KOLKATA_RADIO_STATIONS.length;
@@ -498,8 +502,25 @@ class DawnAudioEngine {
   seekTo(seconds) {
     if (this.activeSourceId !== "mahalaya") return; // Live radio cannot seek
     if (!this.audioEl) this.init();
-    this.audioEl.currentTime = Math.max(0, Math.min(this.duration, seconds));
-    this.currentTime = this.audioEl.currentTime;
+    try {
+      if (this.audioEl && this.audioEl.readyState >= 1) {
+        this.audioEl.currentTime = Math.max(0, Math.min(this.duration || 5400, seconds));
+        this.currentTime = this.audioEl.currentTime;
+      } else {
+        this.currentTime = seconds;
+        if (this.audioEl) {
+          const onLoaded = () => {
+            try {
+              this.audioEl.currentTime = seconds;
+            } catch (e) {}
+            this.audioEl.removeEventListener("loadedmetadata", onLoaded);
+          };
+          this.audioEl.addEventListener("loadedmetadata", onLoaded);
+        }
+      }
+    } catch (e) {
+      this.currentTime = seconds;
+    }
     this.updateChapterByTime(this.currentTime);
     this.notifyListeners();
   }
@@ -510,8 +531,14 @@ class DawnAudioEngine {
       return;
     }
     if (this.activeSourceId !== "mahalaya") return;
+    this.init();
     const nextIdx = (this.currentChapterIndex + 1) % MAHALAYA_CHAPTERS.length;
-    this.seekTo(MAHALAYA_CHAPTERS[nextIdx].timeStart);
+    this.currentChapterIndex = nextIdx;
+    const targetTime = MAHALAYA_CHAPTERS[nextIdx].timeStart;
+    this.currentTime = targetTime;
+    this.seekTo(targetTime);
+    this.updateMediaSessionMetadata();
+    this.notifyListeners();
     if (!this.isPlaying) {
       this.toggle();
     }
@@ -523,13 +550,17 @@ class DawnAudioEngine {
       return;
     }
     if (this.activeSourceId !== "mahalaya") return;
+    this.init();
     if (this.currentTime - MAHALAYA_CHAPTERS[this.currentChapterIndex].timeStart > 5) {
-      this.seekTo(MAHALAYA_CHAPTERS[this.currentChapterIndex].timeStart);
+      this.currentTime = MAHALAYA_CHAPTERS[this.currentChapterIndex].timeStart;
     } else {
-      const prevIdx =
+      this.currentChapterIndex =
         (this.currentChapterIndex - 1 + MAHALAYA_CHAPTERS.length) % MAHALAYA_CHAPTERS.length;
-      this.seekTo(MAHALAYA_CHAPTERS[prevIdx].timeStart);
+      this.currentTime = MAHALAYA_CHAPTERS[this.currentChapterIndex].timeStart;
     }
+    this.seekTo(this.currentTime);
+    this.updateMediaSessionMetadata();
+    this.notifyListeners();
     if (!this.isPlaying) {
       this.toggle();
     }

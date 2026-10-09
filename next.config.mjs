@@ -15,6 +15,14 @@ const nextConfig = {
         source: "/(.*)",
         headers: [
           {
+            key: "Access-Control-Allow-Origin",
+            value: "*",
+          },
+          {
+            key: "Access-Control-Allow-Methods",
+            value: "GET, HEAD, OPTIONS",
+          },
+          {
             key: "Permissions-Policy",
             value: "screen-wake-lock=(self), autoplay=(self), fullscreen=(self)",
           },

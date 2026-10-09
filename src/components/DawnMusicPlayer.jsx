@@ -6,6 +6,7 @@ import {
   getDawnAudioEngine,
   AUDIO_SOURCES,
   KOLKATA_RADIO_STATIONS,
+  MAHALAYA_CHAPTERS,
 } from "@/utils/audioEngine";
 import { usePWA } from "./PWAProvider";
 
@@ -36,6 +37,7 @@ export default function DawnMusicPlayer() {
     KOLKATA_RADIO_STATIONS[0],
   );
   const [stationIndex, setStationIndex] = useState(0);
+  const [showCapsules, setShowCapsules] = useState(false); // Hidden by default; toggles on CD player click
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(5400);
   const [equalizerBars, setEqualizerBars] = useState([0.15, 0.25, 0.18, 0.3]);
@@ -185,6 +187,9 @@ export default function DawnMusicPlayer() {
 
     phys.isDown = false;
     setIsDragging(false);
+    setTimeout(() => {
+      phys.hasMoved = false;
+    }, 50);
 
     window.removeEventListener("pointermove", handlePointerMove);
     window.removeEventListener("pointerup", handlePointerUp);
@@ -213,7 +218,7 @@ export default function DawnMusicPlayer() {
   // Audio Playback Controls
   const handleTogglePlay = async (e) => {
     e.stopPropagation();
-    if (dragPhysics.current.hasMoved) return;
+    if (isDragging) return;
     const audio = getDawnAudioEngine();
     if (!audio) return;
     if (!isPlaying && requestWakeLock) {
@@ -224,7 +229,6 @@ export default function DawnMusicPlayer() {
 
   const handleNext = (e) => {
     e.stopPropagation();
-    if (dragPhysics.current.hasMoved) return;
     const audio = getDawnAudioEngine();
     if (!audio) return;
     audio.nextChapter();
@@ -232,10 +236,37 @@ export default function DawnMusicPlayer() {
 
   const handlePrev = (e) => {
     e.stopPropagation();
-    if (dragPhysics.current.hasMoved) return;
     const audio = getDawnAudioEngine();
     if (!audio) return;
     audio.prevChapter();
+  };
+
+  const handleCDClick = (e) => {
+    e.stopPropagation();
+    if (isDragging) return;
+    setShowCapsules((prev) => !prev);
+  };
+
+  const handleSelectStation = async (idx) => {
+    const audio = getDawnAudioEngine();
+    if (audio) {
+      await audio.setKolkataStation(idx);
+    }
+  };
+
+  const handleSelectChapter = (idx) => {
+    const audio = getDawnAudioEngine();
+    if (audio) {
+      const targetTime = MAHALAYA_CHAPTERS[idx].timeStart;
+      audio.currentChapterIndex = idx;
+      audio.currentTime = targetTime;
+      audio.seekTo(targetTime);
+      audio.updateMediaSessionMetadata();
+      audio.notifyListeners();
+      if (!audio.isPlaying) {
+        audio.toggle();
+      }
+    }
   };
 
   const handleSelectSource = async (sourceId) => {
@@ -266,116 +297,105 @@ export default function DawnMusicPlayer() {
       role="region"
       aria-label="Atmospheric Audio & Radio Player"
     >
-      {/* 1. CINEMATIC SOURCE SELECTOR (Mahalaya Chandipath ⇄ Kolkata Live Radio) */}
+      {/* 1. ZERO-GAP CAPSULE DRAWER DIRECTLY ABOVE CD PLAYER (Hidden by default, reveals on CD player click) */}
       <div
-        className="flex items-center justify-center gap-2 mb-2 no-drag"
-        role="tablist"
-        aria-label="Audio Broadcast Source"
+        className={`w-full overflow-hidden transition-all duration-300 ease-out no-drag flex justify-center ${
+          showCapsules
+            ? "max-h-20 opacity-100 mb-2 translate-y-0"
+            : "max-h-0 opacity-0 mb-0 -translate-y-1 pointer-events-none"
+        }`}
+        aria-hidden={!showCapsules}
       >
-        <button
-          role="tab"
-          aria-selected={activeSourceId === "mahalaya"}
-          aria-label="Mahalaya Chandipath recording"
-          onClick={() => handleSelectSource("mahalaya")}
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] sm:text-xs font-medium tracking-wide transition-all duration-300 backdrop-blur-md cursor-pointer ${
-            activeSourceId === "mahalaya"
-              ? "bg-[#ff7b1a]/25 text-[#ffd199] border border-[#ff7b1a] shadow-[0_0_14px_rgba(255,123,26,0.4)]"
-              : "bg-black/50 text-orange-200/60 border border-orange-500/20 hover:text-orange-200 hover:border-[#ff7b1a]/50"
-          }`}
-        >
-          <span className="text-xs">💿</span>
-          <span>মহিষাসুরমর্দ্দিনী</span>
-        </button>
-
-        <button
-          role="tab"
-          aria-selected={activeSourceId === "bangla-radio"}
-          aria-label="Kolkata West Bengal India live radio stations"
-          onClick={() => handleSelectSource("bangla-radio")}
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] sm:text-xs font-medium tracking-wide transition-all duration-300 backdrop-blur-md cursor-pointer ${
-            activeSourceId === "bangla-radio"
-              ? "bg-[#ff7b1a]/25 text-[#ffd199] border border-[#ff7b1a] shadow-[0_0_14px_rgba(255,123,26,0.4)]"
-              : "bg-black/50 text-orange-200/60 border border-orange-500/20 hover:text-orange-200 hover:border-[#ff7b1a]/50"
-          }`}
-        >
-          <span className="text-xs">📻</span>
-          <span>কলকাতা রেডিও (India)</span>
-          {activeSourceId === "bangla-radio" && isPlaying && (
-            <span
-              className={`w-1.5 h-1.5 rounded-full bg-red-500 ml-0.5 ${
-                prefersReducedMotion ? "opacity-100" : "animate-pulse"
-              }`}
-            />
-          )}
-        </button>
-      </div>
-
-      {/* 1.5. KOLKATA RADIO CHANNELS SELECTOR BAR (Active in Kolkata Radio mode) */}
-      {activeSourceId === "bangla-radio" && (
         <div
-          className="flex items-center justify-center gap-1.5 mb-2 px-1 overflow-x-auto no-scrollbar no-drag"
-          role="radiogroup"
-          aria-label="Kolkata Radio Channels"
+          className="inline-flex items-stretch gap-0 rounded-full bg-[#0c0806]/95 backdrop-blur-xl border-[1.5px] border-[#ff7b1a] shadow-[0_0_20px_rgba(255,123,26,0.35),0_0_40px_rgba(255,123,26,0.15),inset_0_0_10px_rgba(255,123,26,0.08)] p-1 overflow-hidden"
+          role="tablist"
+          aria-label="Audio Mode Selector"
         >
-          {KOLKATA_RADIO_STATIONS.map((st, idx) => {
-            const isSelected = stationIndex === idx;
-            return (
-              <button
-                key={st.id}
-                role="radio"
-                aria-checked={isSelected}
-                onClick={async (e) => {
-                  e.stopPropagation();
-                  const audio = getDawnAudioEngine();
-                  if (audio) await audio.setKolkataStation(idx);
-                }}
-                className={`px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-medium whitespace-nowrap transition-all duration-200 cursor-pointer ${
-                  isSelected
-                    ? "bg-[#ff7b1a] text-black font-semibold shadow-[0_0_10px_rgba(255,123,26,0.6)]"
-                    : "bg-black/65 text-orange-200/75 border border-orange-500/25 hover:text-orange-100 hover:border-orange-400/60"
+          {/* Capsule 1: মহিষাসুরমর্দ্দিনী */}
+          <button
+            role="tab"
+            aria-selected={activeSourceId === "mahalaya"}
+            aria-label="Mahalaya Chandipath recording"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSelectSource("mahalaya");
+            }}
+            className={`flex items-center justify-center gap-1.5 py-1 sm:py-1.5 px-3 sm:px-4 text-[11px] sm:text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer border-r border-[#ff7b1a]/40 rounded-l-full select-none ${
+              activeSourceId === "mahalaya"
+                ? "bg-[#ff7b1a] text-black font-bold shadow-[0_0_14px_rgba(255,123,26,0.7),inset_0_1px_2px_rgba(255,255,255,0.4)]"
+                : "text-orange-200/80 hover:text-white hover:bg-[#ff7b1a]/20"
+            }`}
+          >
+            <span className="text-[11px] sm:text-xs">💿</span>
+            <span className="truncate">মহিষাসুরমর্দ্দিনী</span>
+          </button>
+
+          {/* Capsule 2: কলকাতা রেডিও (India) */}
+          <button
+            role="tab"
+            aria-selected={activeSourceId === "bangla-radio"}
+            aria-label="Kolkata West Bengal India live radio stations"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSelectSource("bangla-radio");
+            }}
+            className={`flex items-center justify-center gap-1.5 py-1 sm:py-1.5 px-3 sm:px-4 text-[11px] sm:text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer rounded-r-full select-none ${
+              activeSourceId === "bangla-radio"
+                ? "bg-[#ff7b1a] text-black font-bold shadow-[0_0_14px_rgba(255,123,26,0.7),inset_0_1px_2px_rgba(255,255,255,0.4)]"
+                : "text-orange-200/80 hover:text-white hover:bg-[#ff7b1a]/20"
+            }`}
+          >
+            <span className="text-[11px] sm:text-xs">📻</span>
+            <span className="truncate">কলকাতা রেডিও (India)</span>
+            {activeSourceId === "bangla-radio" && isPlaying && (
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${
+                  activeSourceId === "bangla-radio" ? "bg-red-700" : "bg-red-500"
+                } ml-0.5 shadow-[0_0_6px_#ff0000] ${
+                  prefersReducedMotion ? "opacity-100" : "animate-pulse"
                 }`}
-                title={`${st.title} • ${st.frequency}`}
-              >
-                {st.title
-                  .replace("আকাশবাণী কলকাতা ", "")
-                  .replace("কলকাতা ", "")}
-              </button>
-            );
-          })}
+              />
+            )}
+          </button>
         </div>
-      )}
+      </div>
 
       {/* 2. DRAGGABLE PLAYER CAPSULE WITH ELASTIC TENSION FEEDBACK */}
       <div
         ref={cardRef}
         onPointerDown={handlePointerDown}
+        onClick={(e) => {
+          if (dragPhysics.current.hasMoved || isDragging) return;
+          if (e.target.closest("button") || e.target.closest("a")) return;
+          setShowCapsules((prev) => !prev);
+        }}
         style={{
           touchAction: "none",
         }}
         className={`relative flex items-center justify-between px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl bg-[#0c0806]/92 backdrop-blur-xl border-[1.5px] border-[#ff7b1a] transition-shadow duration-300 ${
           isDragging
-            ? "cursor-grabbing shadow-[0_15px_35px_rgba(255,123,26,0.5),0_0_65px_rgba(255,123,26,0.25)] scale-[1.02]"
+            ? "cursor-grabbing shadow-[0_15px_35px_rgba(255,123,26,0.5),0_0_65px_rgba(255,123,26,0.25)]"
             : "cursor-grab shadow-[0_0_25px_rgba(255,123,26,0.35),0_0_55px_rgba(255,123,26,0.15),inset_0_0_15px_rgba(255,123,26,0.08)] hover:shadow-[0_0_35px_rgba(255,123,26,0.5),0_0_65px_rgba(255,123,26,0.22)]"
         }`}
       >
         {/* LEFT: 2026 Dynamic Rotating CD/Vinyl with Dynamic Artwork & Hologram */}
         <div
           className="relative flex-shrink-0 group cursor-pointer no-drag select-none"
-          onClick={handleTogglePlay}
+          onClick={handleCDClick}
           title={
-            isPlaying
-              ? `Pause ${activeSourceId === "bangla-radio" ? "Live Radio" : "Mahalaya"}`
-              : `Play ${activeSourceId === "bangla-radio" ? "Live Radio" : "Mahalaya"}`
+            showCapsules
+              ? "Hide channels list (ক্লিক করে লুকান)"
+              : "Click CD to view channels list (চ্যানেল তালিকা দেখুন)"
           }
           role="button"
           tabIndex={0}
           aria-label={
-            isPlaying ? "Pause audio playback" : "Start audio playback"
+            showCapsules ? "Hide channel capsules" : "Show channel capsules"
           }
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              handleTogglePlay(e);
+              handleCDClick(e);
             }
           }}
         >
@@ -399,7 +419,7 @@ export default function DawnMusicPlayer() {
 
           {/* THE ROTATING VINYL / CD DISC */}
           <div
-            className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-15 md:h-15 rounded-full border-[1.5px] border-[#ff7b1a] shadow-[0_0_16px_rgba(255,123,26,0.45)] flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-105 active:scale-95 bg-[#0a0503]"
+            className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-15 md:h-15 rounded-full border-[1.5px] border-[#ff7b1a] shadow-[0_0_16px_rgba(255,123,26,0.45)] flex items-center justify-center overflow-hidden bg-[#0a0503]"
             style={{
               animationName: prefersReducedMotion ? "none" : "spin",
               animationDuration: "10s",
@@ -455,7 +475,19 @@ export default function DawnMusicPlayer() {
         </div>
 
         {/* CENTER: Slot with Track Info & Real-Time Equalizer (No seek bar for live radio) */}
-        <div className="flex-1 mx-2.5 sm:mx-3.5 px-3 py-1.5 sm:py-2 rounded-xl border border-[#ff7b1a]/70 bg-black/50 flex items-center justify-between min-w-0 shadow-[inset_0_0_10px_rgba(255,123,26,0.1)]">
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            if (isDragging) return;
+            setShowCapsules((prev) => !prev);
+          }}
+          title={
+            showCapsules
+              ? "Hide options (ক্লিক করে লুকান)"
+              : "Click to toggle options (অপশন দেখুন)"
+          }
+          className="flex-1 mx-2.5 sm:mx-3.5 px-3 py-1.5 sm:py-2 rounded-xl border border-[#ff7b1a]/70 bg-black/50 flex items-center justify-between min-w-0 shadow-[inset_0_0_10px_rgba(255,123,26,0.1)] cursor-pointer hover:border-[#ff7b1a] transition-colors"
+        >
           <div className="flex flex-col min-w-0 pr-2">
             {activeSourceId === "mahalaya" ? (
               <>

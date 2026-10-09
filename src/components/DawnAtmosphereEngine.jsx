@@ -7,6 +7,8 @@ import FestiveLandscapeLayer from "./FestiveLandscapeLayer";
 import { calculateSolarState } from "@/utils/solarCalculator";
 import { getDawnAudioEngine } from "@/utils/audioEngine";
 
+import MahalayaLoader from "./MahalayaLoader";
+
 // Utility to extract continuous decimal hour from the local real-time clock
 function getRealTimeDecimal() {
   const now = new Date();
@@ -22,6 +24,7 @@ export default function DawnAtmosphereEngine() {
   // 1. Autonomous Real-Time Clock Synchronization
   const [timeDecimal, setTimeDecimal] = useState(getRealTimeDecimal);
   const [dayOfMonth, setDayOfMonth] = useState(() => new Date().getDate());
+  const [isLoading, setIsLoading] = useState(false);
 
   // Compute live solar atmospheric physics based on exact real-time clock
   const solarState = useMemo(() => {
@@ -77,6 +80,27 @@ export default function DawnAtmosphereEngine() {
 
       {/* 4. Mahalaya Chandipath Audio Player Capsule */}
       <DawnMusicPlayer />
+
+      {/* 5. Replay Loader Trigger HUD (Visible when loader is closed) */}
+      {!isLoading && (
+        <button
+          onClick={() => setIsLoading(true)}
+          title="Replay Mahalaya Bloub Animation Loader (50s)"
+          className="fixed top-5 left-5 z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-950/70 hover:bg-red-950/60 border border-zinc-800 hover:border-red-500/40 backdrop-blur-md text-[11px] font-mono text-zinc-300 hover:text-red-300 transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.5)] cursor-pointer group"
+        >
+          <img
+            src="/bloub-cercle-attentif-rouge-anime.svg"
+            alt=""
+            className="w-4 h-4 object-contain group-hover:scale-110 transition-transform"
+          />
+          <span className="tracking-wider">Replay Loader</span>
+        </button>
+      )}
+
+      {/* 6. Mahalaya Bloub Animation Loader Overlay (~50 seconds exploration) */}
+      {isLoading && (
+        <MahalayaLoader onComplete={() => setIsLoading(false)} />
+      )}
 
       {/* NOTE: No atmosphere engine controllers are rendered — it operates 100% autonomously on real-time */}
     </main>
