@@ -147,13 +147,14 @@ export default function PWAProvider({ children }) {
     >
       {children}
 
-      {/* Floating System Utilities (Install PWA badge + Wake Lock pill) */}
-      <div className="fixed top-4 right-4 z-50 flex items-center gap-2 select-none pointer-events-auto">
+      {/* Floating System Utilities (Install PWA badge + Wake Lock pill with Mobile Safe-Area Support) */}
+      <div className="fixed top-[max(0.875rem,env(safe-area-inset-top))] right-3 sm:right-5 z-40 flex items-center gap-1.5 sm:gap-2 select-none pointer-events-auto">
         {/* Offline indicator */}
         {!isOnline && (
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-950/80 border border-red-700/60 backdrop-blur-md text-red-200 text-xs shadow-lg animate-pulse">
+          <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-red-950/80 border border-red-700/60 backdrop-blur-md text-red-200 text-xs shadow-lg animate-pulse">
             <span className="w-2 h-2 rounded-full bg-red-500"></span>
-            Offline Mode
+            <span className="hidden sm:inline">Offline Mode</span>
+            <span className="sm:hidden">Offline</span>
           </div>
         )}
 
@@ -166,7 +167,7 @@ export default function PWAProvider({ children }) {
                 ? "Screen Wake Lock active: screen will remain on during dawn viewing"
                 : "Enable Screen Wake Lock to prevent display from sleeping"
             }
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium backdrop-blur-md border transition-all duration-300 shadow-lg ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-medium backdrop-blur-xl border transition-all duration-300 shadow-lg cursor-pointer active:scale-95 ${
               isWakeLockActive
                 ? "bg-amber-500/20 border-amber-400/50 text-amber-200 shadow-amber-950/40"
                 : "bg-black/40 border-white/10 text-white/60 hover:text-white/90 hover:bg-black/60"
@@ -187,7 +188,8 @@ export default function PWAProvider({ children }) {
                 d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
               />
             </svg>
-            <span>{isWakeLockActive ? "Screen Awake" : "Keep Awake"}</span>
+            <span className="hidden sm:inline">{isWakeLockActive ? "Screen Awake" : "Keep Awake"}</span>
+            <span className="sm:hidden">{isWakeLockActive ? "Awake" : "Awake"}</span>
           </button>
         )}
 

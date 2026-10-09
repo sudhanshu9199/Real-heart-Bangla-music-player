@@ -59,18 +59,32 @@ export default function FestiveLandscapeLayer() {
       if (!stateRef.current.hasInteracted) {
         const w = window.innerWidth;
         const h = window.innerHeight;
-        // Pandal coordinates on right house
-        const px = w * 0.76;
-        const py = h * 0.64;
+        const isMobile = w < 768;
 
-        stateRef.current.targetX = px;
-        stateRef.current.targetY = py;
-        stateRef.current.currentX = px;
-        stateRef.current.currentY = py;
-        stateRef.current.lastX = px;
-        stateRef.current.lastY = py;
-        // Compact resting radius
-        stateRef.current.targetRadius = 85;
+        if (isMobile) {
+          // On mobile, DO NOT display an awkward burning ring in the sky!
+          // Start with portal closed (radius 0) so the serene landscape is clean.
+          stateRef.current.targetRadius = 0;
+          stateRef.current.currentRadius = 0;
+          stateRef.current.targetX = w * 0.5;
+          stateRef.current.targetY = h * 0.72;
+          stateRef.current.currentX = w * 0.5;
+          stateRef.current.currentY = h * 0.72;
+          stateRef.current.lastX = w * 0.5;
+          stateRef.current.lastY = h * 0.72;
+        } else {
+          // Desktop wide screen: gentle preview over the right pandal
+          const px = w * 0.76;
+          const py = h * 0.64;
+
+          stateRef.current.targetX = px;
+          stateRef.current.targetY = py;
+          stateRef.current.currentX = px;
+          stateRef.current.currentY = py;
+          stateRef.current.lastX = px;
+          stateRef.current.lastY = py;
+          stateRef.current.targetRadius = 85;
+        }
       }
     };
 
@@ -95,13 +109,14 @@ export default function FestiveLandscapeLayer() {
       ease: "back.out(1.5)", // subtle spring overshoot on expansion
     });
 
-    // Start with gentle radius reveal on pandal
+    // Start with gentle radius reveal on pandal (only on desktop!)
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
     if (!stateRef.current.hasInteracted && quickSetters.current.r) {
-      quickSetters.current.r(85);
+      quickSetters.current.r(isMobile ? 0 : 85);
     }
   }, []);
 
-  // Pointer Movement Handler with Velocity Calculation
+  // Pointer Movement Handler with Velocity Calculation (Mouse & Touch)
   const handlePointerMove = useCallback(
     (e) => {
       const state = stateRef.current;
@@ -110,11 +125,13 @@ export default function FestiveLandscapeLayer() {
       state.targetX = e.clientX;
       state.targetY = e.clientY;
 
-      // Compact, refined radius on hover (reduced to 95px - 105px as requested)
-      const responsiveRadius = Math.min(
-        108,
-        Math.max(90, window.innerWidth * 0.075),
-      );
+      // Responsive portal radius:
+      // Mobile: 88px (focused jeweler's loupe, perfectly proportioned for phone screens)
+      // Desktop: 95px - 108px
+      const isMobile = window.innerWidth < 768;
+      const responsiveRadius = isMobile
+        ? 88
+        : Math.min(108, Math.max(90, window.innerWidth * 0.075));
       state.targetRadius = responsiveRadius;
 
       // Trigger GSAP springs
@@ -134,10 +151,12 @@ export default function FestiveLandscapeLayer() {
     [hintVisible],
   );
 
-  // Pointer Leave Handler
+  // Pointer Leave / Touch End Handler
   const handlePointerLeave = useCallback(() => {
     const state = stateRef.current;
     state.isHovering = false;
+    // On desktop leave, close portal. On mobile, smoothly reduce to 0
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
     state.targetRadius = 0;
     if (quickSetters.current.r) quickSetters.current.r(0);
   }, []);
@@ -331,12 +350,15 @@ export default function FestiveLandscapeLayer() {
       onTouchStart={(e) => {
         if (e.touches[0]) handlePointerMove(e.touches[0]);
       }}
+      onTouchEnd={handlePointerLeave}
+      onTouchCancel={handlePointerLeave}
       onMouseLeave={handlePointerLeave}
       className="absolute inset-x-0 bottom-0 w-full h-full select-none overflow-hidden z-10 cursor-none"
       style={{
         left: 0,
         right: 0,
         bottom: 0,
+        touchAction: "none",
       }}
       aria-label="Interactive Durga Puja Festive Landscape"
     >
@@ -383,12 +405,13 @@ export default function FestiveLandscapeLayer() {
       {hintVisible && (
         <div
           ref={hintRef}
-          className="absolute top-8 left-1/2 -translate-x-1/2 z-20 pointer-events-none transition-all duration-500"
+          className="absolute top-16 sm:top-20 left-1/2 -translate-x-1/2 z-20 pointer-events-none transition-all duration-500 w-auto px-4 max-w-[92vw]"
         >
-          <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#0d0806]/85 border border-[#ff7b1a]/60 shadow-[0_0_24px_rgba(255,123,26,0.35),0_0_48px_rgba(255,123,26,0.12)] backdrop-blur-xl">
-            <span className="w-2 h-2 rounded-full bg-gradient-to-r from-[#ff7b1a] to-[#ffd166] animate-ping" />
-            <span className="text-xs sm:text-sm font-medium tracking-wide text-[#ffbe76]">
-              ✨ Hover to unveil the sacred celebration
+          <div className="flex items-center gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#0d0806]/90 border border-[#ff7b1a]/50 shadow-[0_0_24px_rgba(255,123,26,0.35),0_0_48px_rgba(255,123,26,0.12)] backdrop-blur-xl">
+            <span className="w-2 h-2 rounded-full bg-gradient-to-r from-[#ff7b1a] to-[#ffd166] animate-ping flex-shrink-0" />
+            <span className="text-[11px] sm:text-xs md:text-sm font-medium tracking-wide text-[#ffbe76] whitespace-nowrap">
+              ✨ <span className="hidden sm:inline">Hover to unveil the sacred celebration</span>
+              <span className="sm:hidden">Touch & drag to unveil Durga Puja</span>
             </span>
           </div>
         </div>

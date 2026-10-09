@@ -290,9 +290,9 @@ export default function DawnMusicPlayer() {
 
   return (
     <div
-      className="absolute bottom-8 sm:bottom-10 md:bottom-12 left-1/2 -translate-x-1/2 z-30 w-[94vw] max-w-2xl select-none"
+      className="absolute bottom-5 sm:bottom-8 md:bottom-10 left-1/2 -translate-x-1/2 z-30 w-[95vw] sm:w-[92vw] max-w-2xl select-none"
       style={{
-        bottom: "calc(2rem + env(safe-area-inset-bottom, 0px))",
+        bottom: "calc(1.25rem + env(safe-area-inset-bottom, 0px))",
       }}
       role="region"
       aria-label="Atmospheric Audio & Radio Player"
@@ -486,19 +486,20 @@ export default function DawnMusicPlayer() {
               ? "Hide options (ক্লিক করে লুকান)"
               : "Click to toggle options (অপশন দেখুন)"
           }
-          className="flex-1 mx-2.5 sm:mx-3.5 px-3 py-1.5 sm:py-2 rounded-xl border border-[#ff7b1a]/70 bg-black/50 flex items-center justify-between min-w-0 shadow-[inset_0_0_10px_rgba(255,123,26,0.1)] cursor-pointer hover:border-[#ff7b1a] transition-colors"
+          className="flex-1 mx-1.5 sm:mx-3 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl border border-[#ff7b1a]/70 bg-black/50 flex items-center justify-between min-w-0 shadow-[inset_0_0_10px_rgba(255,123,26,0.1)] cursor-pointer hover:border-[#ff7b1a] transition-colors"
         >
-          <div className="flex flex-col min-w-0 pr-2">
+          <div className="flex flex-col min-w-0 pr-1.5">
             {activeSourceId === "mahalaya" ? (
               <>
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1 min-w-0">
                   <span className="text-xs sm:text-sm font-semibold tracking-wide text-[#ffbe76] truncate drop-shadow-[0_0_6px_rgba(255,190,118,0.4)]">
-                    মহিষাসুরমর্দ্দিনী • {chapter.title}
+                    <span className="hidden sm:inline">মহিষাসুরমর্দ্দিনী • </span>
+                    {chapter.title || "মহিষাসুরমর্দ্দিনী"}
                   </span>
                 </div>
                 <span className="text-[10px] sm:text-xs text-orange-200/65 tracking-wider truncate">
-                  {formatTime(currentTime)} / {formatTime(duration)} •{" "}
-                  {chapter.subtitle}
+                  {formatTime(currentTime)} / {formatTime(duration)}
+                  <span className="hidden sm:inline"> • {chapter.subtitle}</span>
                 </span>
               </>
             ) : (

@@ -24,7 +24,7 @@ export default function DawnAtmosphereEngine() {
   // 1. Autonomous Real-Time Clock Synchronization
   const [timeDecimal, setTimeDecimal] = useState(getRealTimeDecimal);
   const [dayOfMonth, setDayOfMonth] = useState(() => new Date().getDate());
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Compute live solar atmospheric physics based on exact real-time clock
   const solarState = useMemo(() => {
@@ -55,7 +55,8 @@ export default function DawnAtmosphereEngine() {
 
   return (
     <main suppressHydrationWarning className="relative w-screen h-screen overflow-hidden bg-black select-none font-sans">
-      {/* 1. 4K High-Fidelity Atmosphere Canvas Engine (Sky, 3-Tier Clouds, Sun, Rays, Stars, Trees, Road) */}
+      {/* 1. 4K High-Fidelity Living Sky Engine (Celestial Stars, 3-Tier Moving Clouds, Sun, Crepuscular Rays, Mist) */}
+      {/* NOTE: landscape is set to false because FestiveLandscapeLayer provides the high-res illustrated townscape */}
       <AtmosphereCanvas
         solarState={solarState}
         layersVisible={{
@@ -64,7 +65,7 @@ export default function DawnAtmosphereEngine() {
           nearClouds: true,
           valleyMist: true,
           godRays: true,
-          landscape: true,
+          landscape: false,
           stars: true,
         }}
         fogDensity={1.0}
@@ -76,24 +77,25 @@ export default function DawnAtmosphereEngine() {
       <FestiveLandscapeLayer />
 
       {/* 3. Cinematic Subtle Vignette */}
-      <div className="absolute inset-0 pointer-events-none z-20 bg-[radial-gradient(circle_at_center,transparent_58%,rgba(0,0,0,0.42)_100%)]" />
+      <div className="absolute inset-0 pointer-events-none z-20 bg-[radial-gradient(circle_at_center,transparent_55%,rgba(0,0,0,0.5)_100%)]" />
 
       {/* 4. Mahalaya Chandipath Audio Player Capsule */}
       <DawnMusicPlayer />
 
-      {/* 5. Replay Loader Trigger HUD (Visible when loader is closed) */}
+      {/* 5. Replay Loader Trigger HUD (Responsive Mobile Safe-Area Positioning) */}
       {!isLoading && (
         <button
           onClick={() => setIsLoading(true)}
           title="Replay Mahalaya Bloub Animation Loader (50s)"
-          className="fixed top-5 left-5 z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-950/70 hover:bg-red-950/60 border border-zinc-800 hover:border-red-500/40 backdrop-blur-md text-[11px] font-mono text-zinc-300 hover:text-red-300 transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.5)] cursor-pointer group"
+          className="fixed top-[max(0.875rem,env(safe-area-inset-top))] left-3 sm:left-5 z-30 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-full bg-zinc-950/80 hover:bg-red-950/70 border border-zinc-800 hover:border-red-500/40 backdrop-blur-xl text-[11px] font-mono text-zinc-300 hover:text-red-300 transition-all duration-300 shadow-[0_4px_16px_rgba(0,0,0,0.6)] cursor-pointer group active:scale-95"
         >
           <img
             src="/bloub-cercle-attentif-rouge-anime.svg"
             alt=""
             className="w-4 h-4 object-contain group-hover:scale-110 transition-transform"
           />
-          <span className="tracking-wider">Replay Loader</span>
+          <span className="tracking-wider hidden sm:inline">Replay Loader</span>
+          <span className="tracking-wider sm:hidden">Loader</span>
         </button>
       )}
 

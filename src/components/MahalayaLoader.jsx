@@ -445,21 +445,21 @@ export default function MahalayaLoader({ onComplete }) {
       {/* 2. Atmospheric Dark Vignette */}
       <div className="absolute inset-0 pointer-events-none z-0 bg-[radial-gradient(circle_at_center,transparent_45%,rgba(3,2,6,0.95)_100%)]" />
 
-      {/* 3. Header HUD: Sacred Identity & Skip Button */}
-      <header className="relative z-30 flex items-center justify-between px-6 md:px-12 pt-6 md:pt-8 w-full pointer-events-auto">
-        <div className="flex items-center gap-3.5">
-          <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-red-950/40 border border-red-500/30 shadow-[0_0_15px_rgba(232,72,63,0.25)]">
+      {/* 3. Header HUD: Sacred Identity & Skip Button (Mobile Safe-Area Padding) */}
+      <header className="relative z-30 flex items-center justify-between px-4 sm:px-6 md:px-12 pt-[max(0.875rem,env(safe-area-inset-top))] w-full pointer-events-auto">
+        <div className="flex items-center gap-2.5 sm:gap-3.5">
+          <div className="relative flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-red-950/40 border border-red-500/30 shadow-[0_0_15px_rgba(232,72,63,0.25)] flex-shrink-0">
             <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping absolute opacity-60" />
             <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_10px_#ef4444]" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] font-mono tracking-[0.25em] text-red-400 uppercase font-semibold">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="text-[10px] sm:text-[11px] font-mono tracking-[0.2em] sm:tracking-[0.25em] text-red-400 uppercase font-semibold">
                 মহিষাসুরমর্দ্দিনী
               </span>
-              <span className="text-[10px] text-zinc-500 font-mono">• 4:00 AM</span>
+              <span className="text-[9px] sm:text-[10px] text-zinc-500 font-mono">• 4:00 AM</span>
             </div>
-            <p className="text-xs text-zinc-400 font-sans tracking-wide">
+            <p className="text-[11px] sm:text-xs text-zinc-400 font-sans tracking-wide truncate">
               Sacred Autumn Dawn Sanctuary
             </p>
           </div>
@@ -469,10 +469,10 @@ export default function MahalayaLoader({ onComplete }) {
         <button
           id="skip-loader-btn"
           onClick={handleEnterSanctuary}
-          className="group relative flex items-center gap-2.5 px-4 md:px-5 py-2 md:py-2.5 rounded-full bg-zinc-900/60 hover:bg-red-950/40 border border-zinc-700/60 hover:border-red-500/50 backdrop-blur-md text-xs font-mono text-zinc-300 hover:text-white transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(232,72,63,0.3)] active:scale-95 cursor-pointer"
+          className="group relative flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-5 py-1.5 sm:py-2.5 rounded-full bg-zinc-900/70 hover:bg-red-950/50 border border-zinc-700/60 hover:border-red-500/50 backdrop-blur-xl text-xs font-mono text-zinc-300 hover:text-white transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(232,72,63,0.3)] active:scale-95 cursor-pointer flex-shrink-0"
         >
           <span className="text-zinc-400 group-hover:text-red-400 transition-colors">
-            Enter Sanctuary
+            Enter <span className="hidden sm:inline">Sanctuary</span>
           </span>
           <span className="flex items-center justify-center px-1.5 py-0.5 rounded text-[10px] bg-red-900/40 border border-red-500/30 text-red-300 font-semibold">
             {remainingSeconds}s
@@ -497,11 +497,11 @@ export default function MahalayaLoader({ onComplete }) {
       */}
       <div
         ref={textContainerRef}
-        className="fixed inset-0 z-10 flex flex-col items-center justify-center pointer-events-none select-none px-4"
+        className="fixed inset-0 z-10 flex flex-col items-center justify-center pointer-events-none select-none px-2 sm:px-4"
       >
         {/* Bengali Calligraphic Tag (Revealed on hover with spotlight) */}
         <div className="mb-2 md:mb-4 text-center">
-          <span className="inline-block px-3.5 py-1 rounded-full text-[10px] md:text-xs font-mono tracking-[0.3em] uppercase bg-amber-950/20 border border-amber-500/15 text-amber-300/70 backdrop-blur-sm shadow-[0_0_15px_rgba(245,158,11,0.1)]">
+          <span className="inline-block px-3 sm:px-3.5 py-1 rounded-full text-[9px] sm:text-xs font-mono tracking-[0.25em] sm:tracking-[0.3em] uppercase bg-amber-950/20 border border-amber-500/15 text-amber-300/70 backdrop-blur-sm shadow-[0_0_15px_rgba(245,158,11,0.1)]">
             বীরেন্দ্রকৃষ্ণ ভদ্র • মহিষাসুরমর্দ্দিনী
           </span>
         </div>
@@ -511,12 +511,12 @@ export default function MahalayaLoader({ onComplete }) {
           Base: Completely transparent matching the background color (#050308).
           Spotlight: Radiantly filled in festive colors wherever the cursor hovers!
         */}
-        <div className="relative w-[95vw] max-w-[1700px] flex items-center justify-center">
+        <div className="relative w-[96vw] max-w-[1700px] flex items-center justify-center">
           {/* Layer A: Base Transparent Text matching #050308 (Hidden in the dark) */}
           <div
             className="w-full text-center font-black uppercase tracking-wider leading-none whitespace-nowrap"
             style={{
-              fontSize: "clamp(3.8rem, 16vw, 16rem)",
+              fontSize: "clamp(2.4rem, 13.8vw, 15.5rem)",
               fontFamily: "var(--font-geist-sans), system-ui, sans-serif",
               color: "#050308",
               WebkitTextFillColor: "#050308",
@@ -531,7 +531,7 @@ export default function MahalayaLoader({ onComplete }) {
             ref={spotlightTextRef}
             className="absolute inset-0 w-full text-center font-black uppercase tracking-wider leading-none whitespace-nowrap flex items-center justify-center will-change-[mask-image]"
             style={{
-              fontSize: "clamp(3.8rem, 16vw, 16rem)",
+              fontSize: "clamp(2.4rem, 13.8vw, 15.5rem)",
               fontFamily: "var(--font-geist-sans), system-ui, sans-serif",
               background:
                 "linear-gradient(135deg, #fff7ad 0%, #ffa040 22%, #e8483f 48%, #d81159 74%, #ffd166 100%)",
@@ -548,9 +548,9 @@ export default function MahalayaLoader({ onComplete }) {
         </div>
 
         {/* Sacred Bengali Chant Line (Transparent base, revealed with spotlight) */}
-        <div className="mt-2 md:mt-3 text-center">
+        <div className="mt-2 md:mt-3 text-center px-4">
           <p
-            className="text-base md:text-2xl font-bold tracking-[0.25em] uppercase font-serif"
+            className="text-xs sm:text-lg md:text-2xl font-bold tracking-[0.18em] sm:tracking-[0.25em] uppercase font-serif"
             style={{
               color: "transparent",
               WebkitTextStroke: "0.5px rgba(255, 220, 180, 0.12)",
