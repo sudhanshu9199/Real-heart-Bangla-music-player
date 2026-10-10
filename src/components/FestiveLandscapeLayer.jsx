@@ -93,6 +93,15 @@ export default function FestiveLandscapeLayer() {
     return () => window.removeEventListener("resize", initPreview);
   }, []);
 
+  // Preload both mobile and desktop festive images for instantaneous rendering
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const imgDesktop = new Image();
+    imgDesktop.src = "/DurgaPujaUpperLawer.png";
+    const imgMobile = new Image();
+    imgMobile.src = "/DurgaPujaUpperLawer-Mobile.png";
+  }, []);
+
   // Initialize GSAP spring interpolators
   useEffect(() => {
     // GSAP quickTo with custom easing curves
@@ -376,6 +385,7 @@ export default function FestiveLandscapeLayer() {
 
       {/* 2. FESTIVE LAYER: Durga Puja Celebration (Lights, Pandal, Maa Durga, Diyas) */}
       {/* Clipped dynamically by the ziggling portal polygon */}
+      {/* Mobile ratio uses /DurgaPujaUpperLawer-Mobile.png, desktop uses /DurgaPujaUpperLawer.png */}
       <div
         className="absolute left-0 right-0 bottom-0 w-full h-full pointer-events-none select-none will-change-[clip-path]"
         style={{
@@ -383,16 +393,28 @@ export default function FestiveLandscapeLayer() {
           WebkitClipPath: clipPolygon,
         }}
       >
-        <img
-          src="/DurgaPujaUpperLawer.png"
-          alt="Durga Puja Festive Townscape"
-          className="absolute left-0 right-0 bottom-0 w-full h-full object-cover object-bottom pointer-events-none select-none"
-          style={{
-            left: 0,
-            right: 0,
-            bottom: 0,
-          }}
-        />
+        <picture className="absolute inset-0 w-full h-full pointer-events-none select-none">
+          {/* Mobile phone portrait screens (max-width: 767px) */}
+          <source
+            media="(max-width: 767px)"
+            srcSet="/DurgaPujaUpperLawer-Mobile.png"
+          />
+          {/* Desktop & tablet widescreen (min-width: 768px) */}
+          <source
+            media="(min-width: 768px)"
+            srcSet="/DurgaPujaUpperLawer.png"
+          />
+          <img
+            src="/DurgaPujaUpperLawer.png"
+            alt="Durga Puja Festive Townscape"
+            className="absolute left-0 right-0 bottom-0 w-full h-full object-cover object-bottom pointer-events-none select-none"
+            style={{
+              left: 0,
+              right: 0,
+              bottom: 0,
+            }}
+          />
+        </picture>
       </div>
 
       {/* 3. PERIMETER CANVAS: Luminous Multi-Layer Flame Rim & Floating Embers */}
