@@ -1,69 +1,90 @@
 /**
  * Sacred Patronage & Contribution Configuration — 2026 SaaS Product Architecture
- * Easily customize your receiving UPI ID, Payee Name, and QR Code image.
+ * Optimized with Indian Consumer & Cultural Behavioral Psychology (Auspicious Shagun & UPI Trust)
  */
 
 export const CONTRIBUTION_CONFIG = {
-  // 1. UPI ID (Virtual Payment Address) for Google Pay, PhonePe, Paytm, BHIM, Cred, etc.
-  upiId: "sudhanshu9713@okaxis", // <-- Replace with your UPI ID (e.g. yourname@oksbi, yourname@upi)
-  payeeName: "Sudhanshu Ghosh", // <-- Your display name shown on UPI apps
-  defaultNote: "Mahalaya Dawn Soundscape Sacred Diya",
+  // 1. Official Verified Kotak Mahindra Bank UPI ID (Virtual Payment Address)
+  upiId: "sudhanshughosh@kotakbank",
+  payeeName: "Sudhanshu Ghosh",
+  bankName: "Kotak Mahindra Bank",
+  defaultNote: "Mahalaya Sharodiya Pujor Arghya",
 
-  // 2. Path to custom QR code image in public/ folder.
-  // Directly connects your attached receiving money QR image
+  // 2. Attached QR Code image in public folder
   qrImagePath: "/my-QR.jpeg",
 
-  // 3. Cultural Patronage Tiers (Emotional & Attractive Framing)
+  // 3. Indian Auspicious Shagun Tiers (Ending in +1 for continuity & divine blessings)
   tiers: [
     {
       id: "mati-diya",
       name: "মাটির প্রদীপ",
       subName: "Mati Diya",
       amount: 21,
-      badge: "Warm the Dawn",
+      badge: "শুভ সংকল্প",
       icon: "🪔",
-      desc: "Light a gentle earthen lamp in the virtual dawn sky",
+      desc: "ভোরের আলোয় একটি পবিত্র মাটির প্রদীপ প্রজ্বলন করুন",
       popular: false,
     },
     {
-      id: "shiuli-arghya",
-      name: "শিউলি অর্ঘ্য",
-      subName: "Shiuli Arghya",
+      id: "pushpanjali-arghya",
+      name: "পুষ্পাঞ্জলি অর্ঘ্য",
+      subName: "Pushpanjali Arghya",
       amount: 51,
-      badge: "Most Blessed",
+      badge: "ভক্তদের প্রথম পছন্দ",
       icon: "🌸",
-      desc: "Sponsor ad-free Akashvani Kolkata radio streaming bandwidth",
+      desc: "আকাশবাণী কলকাতা ও লাইভ রেডিওয় ১ দিনের ব্যান্ডউইথ অক্ষুণ্ণ রাখুন",
       popular: true,
+    },
+    {
+      id: "chandipath-seva",
+      name: "চণ্ডীপাঠ সেবা",
+      subName: "Chandipath Seva",
+      amount: 101,
+      badge: "ঐতিহ্য সংরক্ষণ",
+      icon: "📜",
+      desc: "বীরেন্দ্রকৃষ্ণের অমর চণ্ডীপাঠ ও সার্বক্ষণিক সার্ভার চিরন্তন রাখুন",
+      popular: false,
     },
     {
       id: "mahapuja-patron",
       name: "মহাপূজা পৃষ্ঠপোষক",
       subName: "Mahapuja Patron",
-      amount: 101,
-      badge: "Guardian",
+      amount: 251,
+      badge: "চিরন্তন আশীর্বাদ",
       icon: "👑",
-      desc: "Keep the 4K dynamic sky & audio servers glowing all year",
+      desc: "৪কে লিভিং স্কাই ও দুর্গাপূজা হেরিটেজ আর্টওয়ার্কের আজীবন পৃষ্ঠপোষক",
       popular: false,
     },
   ],
 
-  // 4. Cultural Emotional Copy
+  // 4. Rotating Social Proof Devotee Stream (Cultural Bandwagon Effect)
+  socialTicker: [
+    { name: "সৌরভ মুখোপাধ্যায়", city: "কলকাতা", amount: 51, time: "২ মিনিট আগে" },
+    { name: "অনন্যা সেন", city: "শিলিগুড়ি", amount: 21, time: "৫ মিনিট আগে" },
+    { name: "দেবস্মিতা রায়", city: "ঢাকা", amount: 101, time: "৭ মিনিট আগে" },
+    { name: "রাহুল বোস", city: "হাওড়া", amount: 51, time: "১২ মিনিট আগে" },
+    { name: "অরিন্দম ও পরিবার", city: "লন্ডন", amount: 101, time: "১৫ মিনিট আগে" },
+    { name: "প্রিয়াঙ্কা চক্রবর্তী", city: "দুর্গাপুর", amount: 21, time: "১৮ মিনিট আগে" },
+  ],
+
+  // 5. Cultural Emotional Framing Copy
   copy: {
-    badgeText: "🪔 Light a Diya",
-    badgeSubText: "প্রদীপ জ্বালান",
+    badgeText: "🪔 প্রদীপ অর্ঘ্য",
+    badgeSubText: "Light a Diya",
     headline: "ভোরের আলো জ্বালিয়ে রাখুন",
-    subHeadline: "Light a Sacred Diya for Maa Durga",
+    subHeadline: "মা দুর্গার চরণে আপনার পবিত্র প্রদীপ প্রজ্বলন করুন",
     mission:
-      "This living October dawn soundscape & Akashvani radio relay is crafted with pure devotion — 100% ad-free and open for Bengalis across the globe. When you offer an arghya (প্রদীপ), you directly empower server bandwidth, audio preservation, and continuous creative engineering.",
-    gratitudeTitle: "অর্ঘ্য সফল হয়েছে • ধন্য আপনার ভক্তি!",
+      "এই ভোরের আকাশ ও বীরেন্দ্রকৃষ্ণের অমর চণ্ডীপাঠ সম্পূর্ণরূপে বিজ্ঞাপনহীন এবং বিশ্বজুড়ে প্রতিটি বাঙালির জন্য মুক্ত রাখা হয়েছে। আপনার দেওয়া একটি প্রদীপ সরাসরি লাইভ স্ট্রিমিং ও সার্ভারকে আলোকিত রাখবে।",
+    trustText: "🛡️ 100% সুরক্ষিত ব্যাংক ট্রান্সফার • Kotak Mahindra Bank UPI",
+    gratitudeTitle: "অর্ঘ্য সফল হয়েছে • শুভ শারদীয়া!",
     gratitudeMessage:
-      "May Maa Durga bless you with serenity, joy, and prosperity. Your sacred diya is now glowing in the collective dawn soundscape.",
+      "মা দুর্গার অশেষ আশীর্বাদে আপনার পরিবার সুখ, শান্তি ও সুস্বাস্থ্যে ভরে উঠুক। আপনার প্রজ্বলিত প্রদীপ সমগ্র বাংলার ভোরকে আলোকিত করছে।",
   },
 };
 
 /**
  * Builds standard UPI Universal Intent URL
- * Works on Android, iOS, and UPI desktop clients
+ * Supported by Google Pay, PhonePe, Paytm, BHIM, Cred, and mobile browsers
  */
 export function buildUpiIntentUrl({
   upiId = CONTRIBUTION_CONFIG.upiId,
