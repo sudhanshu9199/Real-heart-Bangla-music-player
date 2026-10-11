@@ -8,6 +8,7 @@ import {
   KOLKATA_RADIO_STATIONS,
   MAHALAYA_CHAPTERS,
 } from "@/utils/audioEngine";
+import { getDhakAudioEngine } from "@/utils/dhakAudioEngine";
 import { usePWA } from "./PWAProvider";
 
 // Format seconds into MM:SS or H:MM:SS
@@ -27,6 +28,7 @@ function formatTime(seconds) {
 export default function DawnMusicPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeSourceId, setActiveSourceId] = useState("mahalaya"); // "mahalaya" | "bangla-radio"
+  const [isDhakActive, setIsDhakActive] = useState(false);
   const [radioState, setRadioState] = useState("idle");
   const [chapter, setChapter] = useState({
     title: "Aswiner Sharada Prate",
@@ -43,6 +45,16 @@ export default function DawnMusicPlayer() {
   const [equalizerBars, setEqualizerBars] = useState([0.15, 0.25, 0.18, 0.3]);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const { requestWakeLock } = usePWA();
+
+  // Sync with independent Dhak audio engine (plays in parallel without interfering)
+  useEffect(() => {
+    const dhakAudio = getDhakAudioEngine();
+    if (!dhakAudio) return;
+    const unsub = dhakAudio.subscribe((eng) => {
+      setIsDhakActive(eng.isPlaying);
+    });
+    return () => unsub();
+  }, []);
 
   // Reduced motion media query listener
   useEffect(() => {
@@ -275,6 +287,14 @@ export default function DawnMusicPlayer() {
     await audio.setSource(sourceId);
   };
 
+  const handleToggleDhak = (e) => {
+    e.stopPropagation();
+    const dhakAudio = getDhakAudioEngine();
+    if (dhakAudio) {
+      dhakAudio.toggle();
+    }
+  };
+
   const handleRetryRadio = (e) => {
     e.stopPropagation();
     const audio = getDawnAudioEngine();
@@ -282,12 +302,10 @@ export default function DawnMusicPlayer() {
     audio.retryRadio();
   };
 
-  // Determine active CD cover image
+  // Determine active CD cover image (strictly for Mahalaya or Kolkata Radio)
   const currentCover =
     activeSourceId === "bangla-radio"
       ? AUDIO_SOURCES["bangla-radio"].artwork
-      : activeSourceId === "dhak"
-      ? AUDIO_SOURCES.dhak?.artwork || "/covers/cover-2.jpg"
       : chapter?.cover || "/covers/cover-1.jpg";
 
   return (
@@ -360,24 +378,29 @@ export default function DawnMusicPlayer() {
             )}
           </button>
 
-          {/* Capsule 3: উৎসবের ঢাক (Dhak Music) */}
+          {/* Capsule 3: স্বতন্ত্র উৎসবের ঢাক (Independent Dhak Sound Layer) */}
           <button
-            role="tab"
-            aria-selected={activeSourceId === "dhak"}
-            aria-label="Festive Bengali Durga Puja Dhak Music"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleSelectSource("dhak");
-            }}
+            role="button"
+            aria-label="Toggle independent Dhak music layer on or off"
+            title={
+              isDhakActive
+                ? "ঢাক বন্ধ করুন (Click to turn Dhak sound OFF)"
+                : "ঢাক চালু করুন (Click to turn Dhak sound ON — plays alongside Mahalaya & Radio)"
+            }
+            onClick={handleToggleDhak}
             className={`flex items-center justify-center gap-1 sm:gap-1.5 py-1 sm:py-1.5 px-2.5 sm:px-3 text-[10px] sm:text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer border-r border-[#ff7b1a]/40 select-none ${
-              activeSourceId === "dhak"
-                ? "bg-[#ff7b1a] text-black font-bold shadow-[0_0_14px_rgba(255,123,26,0.7),inset_0_1px_2px_rgba(255,255,255,0.4)]"
+              isDhakActive
+                ? "bg-gradient-to-r from-red-600 to-amber-600 text-white font-bold shadow-[0_0_14px_rgba(255,100,20,0.7)] animate-pulse"
                 : "text-orange-200/80 hover:text-white hover:bg-[#ff7b1a]/20"
             }`}
           >
-            <span className={`text-[10px] sm:text-xs ${activeSourceId === "dhak" && isPlaying ? "animate-bounce" : ""}`}>🥁</span>
-            <span className="truncate">ঢাকের বোল</span>
-            {activeSourceId === "dhak" && isPlaying && (
+            <span className={`text-[10px] sm:text-xs ${isDhakActive ? "animate-bounce" : ""}`}>
+              🥁
+            </span>
+            <span className="truncate">
+              {isDhakActive ? "ঢাক: চালু" : "ঢাক: বন্ধ"}
+            </span>
+            {isDhakActive && (
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 ml-0.5 shadow-[0_0_6px_#10b981] animate-pulse" />
             )}
           </button>
@@ -390,25 +413,10 @@ export default function DawnMusicPlayer() {
               e.stopPropagation();
               window.dispatchEvent(new Event("open_diya_modal"));
             }}
-            className="flex items-center justify-center gap-1 sm:gap-1.5 py-1 sm:py-1.5 px-2.5 sm:px-3 text-[10px] sm:text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer border-r border-[#ff7b1a]/40 select-none text-amber-200/90 hover:text-white hover:bg-[#ff7b1a]/30 group"
+            className="flex items-center justify-center gap-1 sm:gap-1.5 py-1 sm:py-1.5 px-2.5 sm:px-4 text-[10px] sm:text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer rounded-r-full select-none text-amber-200/90 hover:text-white hover:bg-[#ff7b1a]/30 group"
           >
             <span className="text-[10px] sm:text-xs animate-pulse">🪔</span>
             <span className="truncate">প্রদীপ অর্ঘ্য</span>
-          </button>
-
-          {/* Capsule 5: পুজোর নির্ঘণ্ট (Durga Puja Schedule & Rituals) */}
-          <button
-            role="tab"
-            aria-label="Bengali Durga Puja Schedule & Daily Rituals"
-            onClick={(e) => {
-              e.stopPropagation();
-              window.dispatchEvent(new Event("open_puja_schedule"));
-            }}
-            className="flex items-center justify-center gap-1 sm:gap-1.5 py-1 sm:py-1.5 px-2.5 sm:px-3 text-[10px] sm:text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer rounded-r-full select-none text-amber-200/90 hover:text-white hover:bg-[#ff7b1a]/30 group"
-          >
-            <span className="text-[10px] sm:text-xs group-hover:scale-110 transition-transform">📜</span>
-            <span className="truncate hidden sm:inline">নির্ঘণ্ট • Schedule</span>
-            <span className="truncate sm:hidden">Schedule</span>
           </button>
         </div>
       </div>
@@ -544,30 +552,24 @@ export default function DawnMusicPlayer() {
           <div className="flex flex-col min-w-0 pr-1">
             {activeSourceId === "mahalaya" ? (
               <>
-                <div className="flex items-center gap-1 min-w-0">
+                <div className="flex items-center gap-1.5 min-w-0">
                   <span className="text-[11px] sm:text-sm font-semibold tracking-tight sm:tracking-wide text-[#ffbe76] truncate drop-shadow-[0_0_6px_rgba(255,190,118,0.4)]">
                     <span className="hidden sm:inline">মহিষাসুরমর্দ্দিনী • </span>
                     {chapter.title || "মহিষাসুরমর্দ্দিনী"}
                   </span>
+                  {isDhakActive && (
+                    <span
+                      title="স্বতন্ত্র ঢাকের গান সমান্তরালে বাজছে (Dhak sound playing in background)"
+                      className="hidden xs:inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[8.5px] font-mono bg-red-950/80 text-amber-300 border border-red-500/40 animate-pulse flex-shrink-0"
+                    >
+                      <span className="w-1 h-1 rounded-full bg-emerald-400" />
+                      🥁 Dhak ON
+                    </span>
+                  )}
                 </div>
                 <span className="text-[9.5px] sm:text-xs text-orange-200/65 tracking-wider truncate">
                   {formatTime(currentTime)} / {formatTime(duration)}
                   <span className="hidden sm:inline"> • {chapter.subtitle}</span>
-                </span>
-              </>
-            ) : activeSourceId === "dhak" ? (
-              <>
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <span className="text-[11px] sm:text-sm font-semibold tracking-tight sm:tracking-wide text-[#ffbe76] truncate drop-shadow-[0_0_6px_rgba(255,190,118,0.4)]">
-                    🥁 উৎসবের ঢাকের বোল
-                  </span>
-                  <span className="hidden sm:inline-flex px-1.5 py-0.5 rounded text-[9px] font-mono bg-red-950/70 text-red-300 border border-red-500/30 flex-shrink-0 animate-pulse">
-                    PUJA DHAK
-                  </span>
-                </div>
-                <span className="text-[9.5px] sm:text-xs text-orange-200/65 tracking-wider truncate">
-                  {formatTime(currentTime)} / {formatTime(duration)}
-                  <span className="hidden sm:inline"> • ঐতিহ্যবাহী শারদীয়া বাদ্য</span>
                 </span>
               </>
             ) : (
@@ -576,6 +578,15 @@ export default function DawnMusicPlayer() {
                   <span className="text-[11px] sm:text-sm font-semibold tracking-tight sm:tracking-wide text-[#ffbe76] truncate drop-shadow-[0_0_6px_rgba(255,190,118,0.4)]">
                     {currentStation?.title || "আকাশবাণী কলকাতা"}
                   </span>
+                  {isDhakActive && (
+                    <span
+                      title="স্বতন্ত্র ঢাকের গান সমান্তরালে বাজছে (Dhak sound playing in background)"
+                      className="hidden xs:inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[8.5px] font-mono bg-red-950/80 text-amber-300 border border-red-500/40 animate-pulse flex-shrink-0"
+                    >
+                      <span className="w-1 h-1 rounded-full bg-emerald-400" />
+                      🥁 Dhak ON
+                    </span>
+                  )}
                   <span className="hidden sm:inline-flex px-1.5 py-0.5 rounded text-[9px] font-mono bg-orange-950/70 text-orange-300 border border-orange-500/30 flex-shrink-0">
                     {stationIndex + 1}/{KOLKATA_RADIO_STATIONS.length}
                   </span>

@@ -500,7 +500,7 @@ class DawnAudioEngine {
   }
 
   seekTo(seconds) {
-    if (this.activeSourceId !== "mahalaya" && this.activeSourceId !== "dhak") return; // Live radio cannot seek
+    if (this.activeSourceId !== "mahalaya") return; // Live radio cannot seek
     if (!this.audioEl) this.init();
     try {
       if (this.audioEl && this.audioEl.readyState >= 1) {
@@ -567,13 +567,6 @@ class DawnAudioEngine {
   }
 
   getCurrentChapter() {
-    if (this.activeSourceId === "dhak") {
-      return {
-        title: "উৎসবের ঢাকের বোল",
-        subtitle: "Sharodiya Dhak Rhythm • Authentic Beats",
-        cover: "/covers/cover-2.jpg",
-      };
-    }
     return MAHALAYA_CHAPTERS[this.currentChapterIndex];
   }
 
@@ -624,15 +617,6 @@ class DawnAudioEngine {
           album: "Mahalaya Dawn Recitation",
           artwork: [
             { src: chap.cover || "/covers/cover-1.jpg", sizes: "512x512", type: "image/jpeg" },
-          ],
-        });
-      } else if (this.activeSourceId === "dhak") {
-        navigator.mediaSession.metadata = new MediaMetadata({
-          title: "উৎসবের ঢাকের বোল (Sharodiya Dhak)",
-          artist: "Traditional Dhaki Beats",
-          album: "Durga Puja 2026 Soundscape",
-          artwork: [
-            { src: "/covers/cover-2.jpg", sizes: "512x512", type: "image/jpeg" },
           ],
         });
       } else {

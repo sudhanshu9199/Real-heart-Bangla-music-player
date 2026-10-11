@@ -7,7 +7,7 @@ import {
   calculateTimeDelta,
   FESTIVAL_DATES_2026,
 } from "@/utils/durgaPujaRealtime";
-import { getDawnAudioEngine } from "@/utils/audioEngine";
+import { getDhakAudioEngine } from "@/utils/dhakAudioEngine";
 
 /**
  * Procedural Web Audio Synthesizer for instant sacred chime feedback (0KB dependencies)
@@ -131,24 +131,18 @@ export default function DurgaPujaScheduleModal({ isOpen, onClose }) {
     return getFestivalRealtimeStatus(nowDate);
   }, [nowDate]);
 
-  // Sync with central AudioEngine for Dhak playback
+  // Sync with independent DhakAudioEngine for autonomous Dhak playback
   useEffect(() => {
-    const audio = getDawnAudioEngine();
-    if (!audio) return;
+    const dhakAudio = getDhakAudioEngine();
+    if (!dhakAudio) return;
 
-    const handleAudioSync = (eng) => {
-      const isPlayingThis = eng.isPlaying && eng.activeSourceId === "dhak";
-      setIsDhakPlaying(isPlayingThis);
-      if (eng.activeSourceId === "dhak") {
-        setDhakCurrentTime(eng.currentTime);
-        if (eng.duration) setDhakDuration(eng.duration);
-      }
+    const handleDhakSync = (eng) => {
+      setIsDhakPlaying(eng.isPlaying);
+      setDhakCurrentTime(eng.currentTime);
+      if (eng.duration) setDhakDuration(eng.duration);
     };
 
-    const unsubscribe = audio.subscribe(handleAudioSync);
-    // Initial sync
-    handleAudioSync(audio);
-
+    const unsubscribe = dhakAudio.subscribe(handleDhakSync);
     return () => {
       unsubscribe();
     };
@@ -217,19 +211,11 @@ export default function DurgaPujaScheduleModal({ isOpen, onClose }) {
     [langMode]
   );
 
-  // Play / Pause Dhak Music via central Audio Engine
+  // Play / Pause independent festive Dhak Music (autonomous parallel layer)
   const handleToggleDhakMusic = async () => {
-    const audio = getDawnAudioEngine();
-    if (!audio) return;
-
-    if (audio.activeSourceId === "dhak") {
-      await audio.toggle();
-    } else {
-      await audio.setSource("dhak");
-      if (!audio.isPlaying) {
-        await audio.toggle();
-      }
-    }
+    const dhakAudio = getDhakAudioEngine();
+    if (!dhakAudio) return;
+    await dhakAudio.toggle();
     setShowDhakPlayerBar(true);
   };
 
