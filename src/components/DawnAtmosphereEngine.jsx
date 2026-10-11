@@ -86,25 +86,8 @@ export default function DawnAtmosphereEngine() {
       {/* 4. Mahalaya Chandipath Audio Player Capsule */}
       <DawnMusicPlayer />
 
-      {/* 5. Top Left HUD: Replay Loader & Real-Time Presence Badge */}
+      {/* 5. Top Left HUD: Real-Time Collective Presence Badge */}
       <div className="fixed top-[max(0.875rem,env(safe-area-inset-top))] left-3 sm:left-5 z-30 flex items-center gap-1.5 sm:gap-2">
-        {!isLoading && (
-          <button
-            onClick={() => setIsLoading(true)}
-            title="Replay Mahalaya Bloub Animation Loader (50s)"
-            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-zinc-950/80 hover:bg-red-950/70 border border-zinc-800 hover:border-red-500/40 backdrop-blur-xl text-[11px] font-mono text-zinc-300 hover:text-red-300 transition-all duration-300 shadow-[0_4px_16px_rgba(0,0,0,0.6)] cursor-pointer group active:scale-95 flex-shrink-0"
-          >
-            <img
-              src="/bloub-cercle-attentif-rouge-anime.svg"
-              alt=""
-              className="w-4 h-4 object-contain group-hover:scale-110 transition-transform"
-            />
-            <span className="tracking-wider hidden sm:inline">Replay Loader</span>
-            <span className="tracking-wider sm:hidden">Loader</span>
-          </button>
-        )}
-
-        {/* Real-time live online listeners indicator */}
         <LivePresenceBadge />
       </div>
 

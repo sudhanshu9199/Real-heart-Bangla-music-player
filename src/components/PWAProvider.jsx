@@ -215,36 +215,27 @@ export default function PWAProvider({ children }) {
           </button>
         )}
 
-        {/* Install PWA Button (appears when browser triggers beforeinstallprompt) */}
-        {isInstallable && !bannerDismissed && (
-          <div className="flex items-center gap-1.5 bg-gradient-to-r from-amber-600/30 via-orange-600/30 to-amber-700/30 border border-amber-500/40 backdrop-blur-md rounded-full px-3 py-1 shadow-xl animate-fade-in">
-            <button
-              onClick={installApp}
-              className="flex items-center gap-2 text-xs font-semibold text-amber-200 hover:text-amber-100 transition-colors"
+        {/* Install PWA Quick Action (Concise small-sized symbol only) */}
+        {isInstallable && (
+          <button
+            onClick={installApp}
+            title="Install App (PWA)"
+            aria-label="Install App"
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-black/40 hover:bg-amber-500/20 border border-amber-400/40 hover:border-amber-400/80 text-amber-300 hover:text-amber-200 backdrop-blur-xl shadow-lg transition-all duration-300 active:scale-90 cursor-pointer flex-shrink-0"
+          >
+            <svg
+              className="w-3.5 h-3.5 stroke-current"
+              fill="none"
+              strokeWidth="2.2"
+              viewBox="0 0 24 24"
             >
-              <svg
-                className="w-3.5 h-3.5 text-amber-400"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                />
-              </svg>
-              <span>Install PWA</span>
-            </button>
-            <button
-              onClick={() => setBannerDismissed(true)}
-              className="text-white/40 hover:text-white/80 p-0.5 ml-1 transition-colors"
-              aria-label="Dismiss install prompt"
-            >
-              ✕
-            </button>
-          </div>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
+            </svg>
+          </button>
         )}
       </div>
 

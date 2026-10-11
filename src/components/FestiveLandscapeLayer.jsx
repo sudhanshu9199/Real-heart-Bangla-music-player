@@ -68,7 +68,6 @@ export default function FestiveLandscapeLayer() {
   const [isFestivePrimary, setIsFestivePrimary] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transitionTarget, setTransitionTarget] = useState(false);
-  const [swapToast, setSwapToast] = useState(null);
 
   const isSwappingRef = useRef(false);
   const lastTapRef = useRef({ time: 0, x: 0, y: 0 });
@@ -270,15 +269,7 @@ export default function FestiveLandscapeLayer() {
         color: targetWorld ? "#ff7b1a" : "#60a5fa",
       });
 
-      // 4. Temporary toast indicator
-      setSwapToast(
-        targetWorld
-          ? "🪔 Durga Puja Celebration Inverted (Base Layer)"
-          : "🌅 Serene Dawn Townscape Inverted (Base Layer)"
-      );
-      setTimeout(() => setSwapToast(null), 2800);
-
-      // 5. GSAP Advanced 3D Epicenter Timeline
+      // 4. GSAP Advanced 3D Epicenter Timeline
       const tl = gsap.timeline({
         onComplete: () => {
           setIsFestivePrimary(targetWorld);
@@ -636,20 +627,8 @@ export default function FestiveLandscapeLayer() {
         className="absolute inset-0 w-full h-full pointer-events-none select-none z-30"
       />
 
-      {/* 5. TOAST NOTIFICATION: Layer Swap Inversion Feedback */}
-      {swapToast && (
-        <div className="fixed top-20 sm:top-24 left-1/2 -translate-x-1/2 z-40 pointer-events-none animate-in fade-in zoom-in-95 duration-300 px-4 max-w-[92vw]">
-          <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-zinc-950/90 border border-amber-500/50 shadow-[0_0_24px_rgba(245,158,11,0.35)] backdrop-blur-xl">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping flex-shrink-0" />
-            <span className="text-xs sm:text-sm font-medium tracking-wide text-amber-200 whitespace-nowrap">
-              {swapToast}
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* 6. LUXURY 2026 GUIDANCE PILL: Elegant festive micro-interaction toast */}
-      {hintVisible && !swapToast && (
+      {/* 5. LUXURY 2026 GUIDANCE PILL: Elegant festive micro-interaction toast */}
+      {hintVisible && (
         <div
           ref={hintRef}
           className="absolute top-[max(4.25rem,calc(3.5rem+env(safe-area-inset-top,0px)))] sm:top-20 left-1/2 -translate-x-1/2 z-20 pointer-events-none transition-all duration-500 w-auto px-4 max-w-[92vw]"
