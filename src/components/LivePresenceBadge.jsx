@@ -3,48 +3,57 @@
 import React, { useState, useEffect, useRef } from "react";
 
 /**
- * LivePresenceBadge — 2026 SaaS Real-Time Presence & Collective Social Proof Engine
- * - Living organic listener calculation calibrated to circadian Mahalaya listening patterns
- * - Cross-tab state synchronization via BroadcastChannel
- * - Micro-fluctuations with smoothed Poisson drift
- * - Interactive global community breakdown card
+ * LivePresenceBadge — 2026 Ground-Reality Circadian Presence Engine
+ * - Evolving, realistic 24-hour listener curve calibrated to genuine Indian cultural habits
+ * - Dawn peak (4am - 6:30am) reflecting the iconic Mahalaya listening surge
+ * - Natural afternoon and midnight lulls (no suspicious 1300+ constant numbers)
+ * - Removed the weird orange/amber indicator dot for a clean, premium capsule aesthetic
+ * - Smooth micro-drift (-1 to +1) reflecting organic listener departures & arrivals
+ * - Cross-tab synchronization via BroadcastChannel
  */
 export default function LivePresenceBadge() {
-  const [onlineCount, setOnlineCount] = useState(1480);
+  const [onlineCount, setOnlineCount] = useState(48);
   const [isOpen, setIsOpen] = useState(false);
-  const [hasLitDiya, setHasLitDiya] = useState(false);
   const popoverRef = useRef(null);
 
-  // Check if current user has lit a sacred diya
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const checkDiya = () => {
-      setHasLitDiya(localStorage.getItem("mahalaya_diya_lit") === "true");
-    };
-    checkDiya();
-    window.addEventListener("storage", checkDiya);
-    window.addEventListener("diya_lit_event", checkDiya);
-    return () => {
-      window.removeEventListener("storage", checkDiya);
-      window.removeEventListener("diya_lit_event", checkDiya);
-    };
-  }, []);
+  // Smooth Circadian Baseline calibrated to ground-reality Indian cultural patterns
+  const getCircadianBase = () => {
+    const now = new Date();
+    const hour = now.getHours() + now.getMinutes() / 60; // Floating hour e.g. 14.5 for 2:30 PM
+
+    if (hour >= 4 && hour < 7) {
+      // Dawn Mahalaya spike (Iconic Bhorer Chandi Path peak: ~180 to ~340 listeners)
+      const t = (hour - 4) / 3;
+      return Math.round(180 + Math.sin(t * Math.PI) * 160);
+    } else if (hour >= 7 && hour < 12) {
+      // Morning devotional reflection hours: ~110 to ~180 listeners
+      const t = (hour - 7) / 5;
+      return Math.round(180 - t * 70);
+    } else if (hour >= 12 && hour < 17) {
+      // Afternoon lull (work/school/siesta): ~38 to ~65 listeners
+      const t = (hour - 12) / 5;
+      return Math.round(68 - Math.sin(t * Math.PI) * 26);
+    } else if (hour >= 17 && hour < 22) {
+      // Evening arati / festive soundscape peak: ~130 to ~240 listeners
+      const t = (hour - 17) / 5;
+      return Math.round(130 + Math.sin(t * Math.PI) * 110);
+    } else if (hour >= 22 && hour < 24) {
+      // Late night winding down: ~70 to ~110 listeners
+      const t = (hour - 22) / 2;
+      return Math.round(110 - t * 45);
+    } else {
+      // Deep midnight (00:00 - 04:00): Quietest night-owl hours (~18 to ~36 listeners)
+      const t = hour / 4;
+      return Math.round(52 - Math.sin(t * Math.PI) * 34);
+    }
+  };
 
   // Circadian & organic realistic listener simulation engine
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Calculate baseline based on current local hour (Dawn 4am-7am spikes highest)
-    const getCircadianBase = () => {
-      const hour = new Date().getHours();
-      if (hour >= 4 && hour <= 7) return 2450; // Dawn peak
-      if (hour >= 8 && hour <= 12) return 1820; // Morning
-      if (hour >= 18 && hour <= 23) return 1640; // Evening
-      return 1320; // Night
-    };
-
-    const initialBase = getCircadianBase() + Math.floor((Math.random() - 0.5) * 80);
-    setOnlineCount(initialBase);
+    const initialBase = getCircadianBase() + Math.floor((Math.random() - 0.5) * 6);
+    setOnlineCount(Math.max(12, initialBase));
 
     // Cross-tab sync via BroadcastChannel
     let channel;
@@ -59,13 +68,13 @@ export default function LivePresenceBadge() {
       // BroadcastChannel fallback
     }
 
-    // Organic drift interval (drifts smoothly every 4-7 seconds)
+    // Organic drift interval (subtle -1, 0, or +1 fluctuations every 6.5s)
     const interval = setInterval(() => {
       setOnlineCount((prev) => {
-        const delta = Math.floor(Math.random() * 7) - 3; // -3 to +3
+        const delta = Math.floor(Math.random() * 3) - 1; // -1, 0, or +1
         const base = getCircadianBase();
-        const minBound = Math.floor(base * 0.85);
-        const maxBound = Math.floor(base * 1.15);
+        const minBound = Math.max(10, Math.floor(base * 0.85));
+        const maxBound = Math.ceil(base * 1.15);
         const next = Math.max(minBound, Math.min(maxBound, prev + delta));
 
         if (channel) {
@@ -73,7 +82,7 @@ export default function LivePresenceBadge() {
         }
         return next;
       });
-    }, 5500);
+    }, 6500);
 
     return () => {
       clearInterval(interval);
@@ -102,10 +111,10 @@ export default function LivePresenceBadge() {
 
   return (
     <div className="relative inline-flex items-center select-none" ref={popoverRef}>
-      {/* 1. REAL-TIME PRESENCE TRIGGER PILL */}
+      {/* 1. REAL-TIME PRESENCE TRIGGER PILL (Clean, No Stray Dot) */}
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        title="View live global listeners across cities (শ্রোতাদের উপস্থিতি)"
+        title="View live listeners across regional hubs (লাইভ শ্রোতা)"
         aria-label={`${formattedCount} people currently listening live`}
         aria-expanded={isOpen}
         className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-zinc-950/80 hover:bg-zinc-900/90 border border-emerald-500/30 hover:border-emerald-400/60 backdrop-blur-xl text-[11px] font-mono text-zinc-200 transition-all duration-300 shadow-[0_4px_16px_rgba(0,0,0,0.5),0_0_12px_rgba(16,185,129,0.12)] cursor-pointer group active:scale-95"
@@ -126,17 +135,9 @@ export default function LivePresenceBadge() {
           <span className="hidden sm:inline">Listening Live</span>
           <span className="sm:hidden">Live</span>
         </span>
-
-        {/* Diya Patron Mini Ribbon if user has contributed */}
-        {hasLitDiya && (
-          <span
-            title="You lit a sacred diya for Maa Durga!"
-            className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_6px_#f59e0b] ml-0.5"
-          />
-        )}
       </button>
 
-      {/* 2. 2026 SAAS COLLECTIVE PRESENCE COMMUNITY CARD */}
+      {/* 2. REAL-TIME COLLECTIVE HARMONY COMMUNITY CARD */}
       {isOpen && (
         <div className="absolute top-full left-0 mt-2.5 z-50 w-72 sm:w-80 p-3.5 sm:p-4 rounded-2xl bg-[#0c0806]/96 border border-emerald-500/40 shadow-[0_20px_50px_rgba(0,0,0,0.8),0_0_30px_rgba(16,185,129,0.2)] backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-200">
           {/* Header */}
@@ -154,10 +155,10 @@ export default function LivePresenceBadge() {
 
           {/* Subtext */}
           <p className="text-[11px] text-zinc-400 leading-relaxed mt-2.5 font-sans">
-            You are sharing this sacred dawn soundscape in real-time with thousands of listeners across 42 global cities.
+            You are sharing this sacred dawn soundscape in real-time with devotees across cultural hubs.
           </p>
 
-          {/* Top Cities Distribution (2026 SaaS Social Proof Grid) */}
+          {/* Regional Hubs Distribution */}
           <div className="mt-3 space-y-1.5">
             <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">
               Active Regional Hubs
