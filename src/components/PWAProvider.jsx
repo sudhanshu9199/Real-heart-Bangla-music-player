@@ -192,37 +192,33 @@ export default function PWAProvider({ children }) {
       {children}
 
       {/* Floating System Utilities (Puja Schedule + Living Darshan + Light a Diya + Wake Lock + Install PWA badge) */}
-      <div className="fixed top-[max(0.875rem,env(safe-area-inset-top))] right-3 sm:right-5 z-40 flex items-center gap-1.5 sm:gap-2 select-none pointer-events-auto">
+      <div className="fixed top-[max(0.625rem,env(safe-area-inset-top))] right-2 sm:right-5 z-40 flex items-center gap-1 sm:gap-2 select-none pointer-events-auto max-w-[calc(100vw-5rem)] sm:max-w-none justify-end">
         {/* Sri Sri Durga Living 4-Prahar Darshan Trigger (Option B) */}
         <button
           onClick={() => setIsDarshanModalOpen(true)}
           title="স্বর্গীয় চার প্রহর দুর্গা দর্শন (Live 4-Prahar Durga Darshan & Rituals)"
-          className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#2a0e05]/95 to-[#4d1908]/95 hover:from-[#3a1508] hover:to-[#61220a] border border-[#ff7b1a]/60 hover:border-[#ff7b1a] text-[#ffbe76] hover:text-white text-xs font-medium backdrop-blur-xl shadow-[0_0_16px_rgba(255,123,26,0.35)] transition-all duration-300 active:scale-95 cursor-pointer group flex-shrink-0"
+          className="flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-gradient-to-r from-[#2a0e05]/95 to-[#4d1908]/95 hover:from-[#3a1508] hover:to-[#61220a] border border-[#ff7b1a]/60 hover:border-[#ff7b1a] text-[#ffbe76] hover:text-white text-[11px] sm:text-xs font-medium backdrop-blur-xl shadow-[0_0_16px_rgba(255,123,26,0.35)] transition-all duration-300 active:scale-95 cursor-pointer group flex-shrink-0"
         >
           <span className="text-xs group-hover:scale-110 transition-transform">🪷</span>
           <span className="hidden lg:inline">শ্রীশ্রী দর্শন • Live Darshan</span>
           <span className="hidden sm:inline lg:hidden">Live Darshan</span>
           <span className="sm:hidden">দর্শন</span>
-          <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono bg-red-950/80 text-red-300 border border-red-500/50 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-ping" />
-            <span>{currentSlot?.icon}</span>
-          </span>
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping ml-0.5" />
         </button>
 
         {/* Durga Puja Multi-Modal Schedule Trigger (Inclusive for Pravasi Bengalis & Global Devotees) */}
-        {/* Durga Puja Multi-Modal Schedule Trigger with Live Days Countdown */}
         <button
           onClick={() => setIsScheduleModalOpen(true)}
           title="বাঙালির দুর্গাপূজা নির্ঘণ্ট ২০২৬ (Durga Puja Schedule, Spoken Bengali & Live Countdowns)"
-          className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#200e05]/95 to-[#3d1808]/95 hover:from-[#311608] hover:to-[#52200a] border border-[#ff7b1a]/60 hover:border-[#ff7b1a] text-[#ffbe76] hover:text-white text-xs font-medium backdrop-blur-xl shadow-[0_0_16px_rgba(255,123,26,0.3)] transition-all duration-300 active:scale-95 cursor-pointer group flex-shrink-0"
+          className="flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-gradient-to-r from-[#200e05]/95 to-[#3d1808]/95 hover:from-[#311608] hover:to-[#52200a] border border-[#ff7b1a]/60 hover:border-[#ff7b1a] text-[#ffbe76] hover:text-white text-[11px] sm:text-xs font-medium backdrop-blur-xl shadow-[0_0_16px_rgba(255,123,26,0.3)] transition-all duration-300 active:scale-95 cursor-pointer group flex-shrink-0"
         >
           <span className="text-xs group-hover:scale-110 transition-transform">📜</span>
           <span className="hidden md:inline">পুজোর নির্ঘণ্ট • Schedule</span>
-          <span className="hidden sm:inline md:hidden">Pujo Schedule</span>
-          <span className="sm:hidden">Schedule</span>
+          <span className="hidden sm:inline md:hidden">Schedule</span>
           {realtime?.mainCountdown && !realtime.mainCountdown.isPast && (
             <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono bg-[#ff7b1a]/25 text-[#ffd199] border border-[#ff7b1a]/40 shadow-[0_0_8px_rgba(255,123,26,0.4)]">
-              {realtime.mainCountdown.days}d left
+              <span className="hidden sm:inline">{realtime.mainCountdown.days}d left</span>
+              <span className="sm:hidden">{realtime.mainCountdown.days}d</span>
             </span>
           )}
         </button>
@@ -231,19 +227,17 @@ export default function PWAProvider({ children }) {
         <button
           onClick={() => setIsDiyaModalOpen(true)}
           title="Light a Sacred Diya & Support the Soundscape (প্রদীপ জ্বালান)"
-          className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#2a1306]/90 to-[#451e08]/90 hover:from-[#3d1a08] hover:to-[#5c280b] border border-[#ff7b1a]/60 hover:border-[#ff7b1a] text-[#ffbe76] hover:text-white text-xs font-medium backdrop-blur-xl shadow-[0_0_16px_rgba(255,123,26,0.3)] transition-all duration-300 active:scale-95 cursor-pointer group flex-shrink-0"
+          className="flex items-center gap-1.5 p-1.5 sm:px-3.5 sm:py-1.5 rounded-full bg-gradient-to-r from-[#2a1306]/90 to-[#451e08]/90 hover:from-[#3d1a08] hover:to-[#5c280b] border border-[#ff7b1a]/60 hover:border-[#ff7b1a] text-[#ffbe76] hover:text-white text-xs font-medium backdrop-blur-xl shadow-[0_0_16px_rgba(255,123,26,0.3)] transition-all duration-300 active:scale-95 cursor-pointer group flex-shrink-0"
         >
           <span className="text-xs group-hover:scale-110 transition-transform animate-pulse">🪔</span>
           <span className="hidden sm:inline">Light a Diya</span>
-          <span className="sm:hidden">Diya</span>
         </button>
 
         {/* Offline indicator */}
         {!isOnline && (
-          <div className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-red-950/80 border border-red-700/60 backdrop-blur-md text-red-200 text-xs shadow-lg animate-pulse">
-            <span className="w-2 h-2 rounded-full bg-red-500"></span>
-            <span className="hidden sm:inline">Offline Mode</span>
-            <span className="sm:hidden">Offline</span>
+          <div className="flex items-center gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full bg-red-950/80 border border-red-700/60 backdrop-blur-md text-red-200 text-xs shadow-lg animate-pulse">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+            <span className="hidden sm:inline">Offline</span>
           </div>
         )}
 
@@ -256,7 +250,7 @@ export default function PWAProvider({ children }) {
                 ? "Screen Wake Lock active: screen will remain on during dawn viewing"
                 : "Enable Screen Wake Lock to prevent display from sleeping"
             }
-            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-medium backdrop-blur-xl border transition-all duration-300 shadow-lg cursor-pointer active:scale-95 ${
+            className={`flex items-center gap-1.5 p-1.5 sm:px-3 sm:py-1.5 rounded-full text-xs font-medium backdrop-blur-xl border transition-all duration-300 shadow-lg cursor-pointer active:scale-95 ${
               isWakeLockActive
                 ? "bg-amber-500/20 border-amber-400/50 text-amber-200 shadow-amber-950/40"
                 : "bg-black/40 border-white/10 text-white/60 hover:text-white/90 hover:bg-black/60"
@@ -278,7 +272,6 @@ export default function PWAProvider({ children }) {
               />
             </svg>
             <span className="hidden sm:inline">{isWakeLockActive ? "Screen Awake" : "Keep Awake"}</span>
-            <span className="sm:hidden">{isWakeLockActive ? "Awake" : "Awake"}</span>
           </button>
         )}
 
@@ -288,10 +281,10 @@ export default function PWAProvider({ children }) {
             onClick={installApp}
             title="Install App (PWA)"
             aria-label="Install App"
-            className="flex items-center justify-center w-8 h-8 rounded-full bg-black/40 hover:bg-amber-500/20 border border-amber-400/40 hover:border-amber-400/80 text-amber-300 hover:text-amber-200 backdrop-blur-xl shadow-lg transition-all duration-300 active:scale-90 cursor-pointer flex-shrink-0"
+            className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/40 hover:bg-amber-500/20 border border-amber-400/40 hover:border-amber-400/80 text-amber-300 hover:text-amber-200 backdrop-blur-xl shadow-lg transition-all duration-300 active:scale-90 cursor-pointer flex-shrink-0"
           >
             <svg
-              className="w-3.5 h-3.5 stroke-current"
+              className="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-current"
               fill="none"
               strokeWidth="2.2"
               viewBox="0 0 24 24"

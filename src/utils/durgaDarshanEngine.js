@@ -3,8 +3,10 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   PRAHAR_SLOTS,
-  SPECIAL_DARSHAN_EVENTS,
+  FESTIVAL_DAY_DARSHAN_MATRIX,
+  getFestivalDayKey,
   getActivePraharSlot,
+  getDarshanForDayAndSlot,
   getNextPraharCountdown,
 } from "@/data/durgaDarshanCatalog";
 
@@ -20,26 +22,26 @@ export function preloadDarshanImage(url) {
 }
 
 /**
- * Preload all core 4 Prahar images once on initial mount
+ * Preload all core images for the current active day
  */
 export function preloadAllDarshanImages() {
   if (typeof window === "undefined") return;
+  const dayKey = getFestivalDayKey(new Date());
   PRAHAR_SLOTS.forEach((slot) => {
-    preloadDarshanImage(slot.image);
+    const data = getDarshanForDayAndSlot(dayKey, slot.id);
+    if (data?.image) preloadDarshanImage(data.image);
   });
-  preloadDarshanImage(SPECIAL_DARSHAN_EVENTS.dashami.image);
 }
 
 /**
  * Custom React Hook for Living Darshan Synchronization
- * Continuously computes the active slot, countdown, and timeline.
+ * Continuously computes the active day, active slot, countdown, and timeline.
  */
 export function useLivingDarshan() {
   const [nowDate, setNowDate] = useState(() => new Date());
 
   // High precision timer (updates every second for live countdowns)
   useEffect(() => {
-    // Initial preload of all assets
     preloadAllDarshanImages();
 
     const timer = setInterval(() => {
@@ -49,22 +51,33 @@ export function useLivingDarshan() {
     return () => clearInterval(timer);
   }, []);
 
-  // 1. Current Active Prahar Slot
+  // 1. Current Festival Day Key (e.g. devipaksha, shashthi, saptami, ashtami, navami, dashami)
+  const currentDayKey = useMemo(() => {
+    return getFestivalDayKey(nowDate);
+  }, [nowDate]);
+
+  // 2. Current Active Prahar Slot Definition
   const currentSlot = useMemo(() => {
     return getActivePraharSlot(nowDate);
   }, [nowDate]);
 
-  // 2. Countdown to next Prahar transformation
+  // 3. Current Live Darshan details (includes the day's specific image, title, pandal, and ritual)
+  const currentDarshan = useMemo(() => {
+    return getDarshanForDayAndSlot(currentDayKey, currentSlot.id);
+  }, [currentDayKey, currentSlot.id]);
+
+  // 4. Countdown to next Prahar transformation
   const countdown = useMemo(() => {
     const data = getNextPraharCountdown(nowDate);
     // Preload next image if within 20 minutes
     if (data.shouldPreloadNext && data.nextSlot) {
-      preloadDarshanImage(data.nextSlot.image);
+      const nextDarshan = getDarshanForDayAndSlot(currentDayKey, data.nextSlot.id);
+      if (nextDarshan?.image) preloadDarshanImage(nextDarshan.image);
     }
     return data;
-  }, [nowDate]);
+  }, [nowDate, currentDayKey]);
 
-  // 3. Today's 4-Prahar Timeline Array with live status (past / active / upcoming)
+  // 5. Today's 4-Prahar Timeline Array with live status (past / active / upcoming)
   const todayTimeline = useMemo(() => {
     const currentHour = nowDate.getHours();
 
@@ -74,7 +87,6 @@ export function useLivingDarshan() {
       if (slot.id === currentSlot.id) {
         status = "active";
       } else {
-        // Special handle for nishitha (wraps around midnight)
         if (slot.id === "nishitha") {
           status = currentHour >= 22 || currentHour < 4 ? "active" : currentHour >= 4 ? "past" : "upcoming";
         } else if (currentHour >= slot.endHour) {
@@ -84,25 +96,34 @@ export function useLivingDarshan() {
         }
       }
 
+      const darshanData = getDarshanForDayAndSlot(currentDayKey, slot.id);
+
       return {
         ...slot,
+        ...darshanData,
         status,
         isActive: slot.id === currentSlot.id,
       };
     });
-  }, [nowDate, currentSlot]);
+  }, [nowDate, currentDayKey, currentSlot]);
 
   return {
     nowDate,
+    currentDayKey,
     currentSlot,
+    currentDarshan,
     countdown,
     todayTimeline,
     allSlots: PRAHAR_SLOTS,
+    allDays: Object.keys(FESTIVAL_DAY_DARSHAN_MATRIX).map((key) => ({
+      key,
+      ...FESTIVAL_DAY_DARSHAN_MATRIX[key],
+    })),
   };
 }
 
 /**
- * Helper to dispatch open/close modal events globally
+ * Global modal triggers
  */
 export function openDarshanModal() {
   if (typeof window !== "undefined") {

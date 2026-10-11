@@ -2,37 +2,46 @@
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLivingDarshan } from "@/utils/durgaDarshanEngine";
-import { PRAHAR_SLOTS, DARSHAN_MANTRAS } from "@/data/durgaDarshanCatalog";
+import {
+  PRAHAR_SLOTS,
+  FESTIVAL_DAY_DARSHAN_MATRIX,
+  getDarshanForDayAndSlot,
+  DARSHAN_MANTRAS,
+} from "@/data/durgaDarshanCatalog";
 import { playDevotionalChime } from "@/utils/devotionalChimes";
 import { getDhakAudioEngine } from "@/utils/dhakAudioEngine";
 
 export default function DurgaDarshanModal({ isOpen, onClose }) {
-  const { currentSlot, countdown, todayTimeline } = useLivingDarshan();
-  
-  // Selected slot for viewing (defaults to active live slot)
+  const { currentDayKey, currentSlot, countdown, todayTimeline } = useLivingDarshan();
+
+  // Selected Day Key (default to current day)
+  const [selectedDayKey, setSelectedDayKey] = useState(currentDayKey || "devipaksha");
+
+  // Selected Prahar Slot (default to active live slot)
   const [selectedSlotId, setSelectedSlotId] = useState(currentSlot?.id || "sandhya");
-  
+
   // Fullscreen wallpaper view mode
   const [isFullscreenView, setIsFullscreenView] = useState(false);
-  
+
   // Script / Language mode: "bonglish" | "bn" | "en"
   const [langMode, setLangMode] = useState("bonglish");
-  
+
   // Copied state
   const [copiedMantra, setCopiedMantra] = useState(false);
-  
+
   // Audio chimes
   const [playingChime, setPlayingChime] = useState(null);
-  
+
   // Dhak audio sync
   const [isDhakPlaying, setIsDhakPlaying] = useState(false);
 
-  // Sync selected slot to active slot on open
+  // Sync selected day and slot on modal open
   useEffect(() => {
-    if (isOpen && currentSlot?.id) {
-      setSelectedSlotId(currentSlot.id);
+    if (isOpen) {
+      if (currentDayKey) setSelectedDayKey(currentDayKey);
+      if (currentSlot?.id) setSelectedSlotId(currentSlot.id);
     }
-  }, [isOpen, currentSlot?.id]);
+  }, [isOpen, currentDayKey, currentSlot?.id]);
 
   // Load saved language preference
   useEffect(() => {
@@ -55,10 +64,11 @@ export default function DurgaDarshanModal({ isOpen, onClose }) {
 
   // Currently viewed slot data
   const viewedSlot = useMemo(() => {
-    return PRAHAR_SLOTS.find((s) => s.id === selectedSlotId) || currentSlot;
-  }, [selectedSlotId, currentSlot]);
+    return getDarshanForDayAndSlot(selectedDayKey, selectedSlotId);
+  }, [selectedDayKey, selectedSlotId]);
 
-  const isViewingLiveSlot = viewedSlot.id === currentSlot.id;
+  const isViewingLiveSlot =
+    selectedDayKey === currentDayKey && viewedSlot.id === currentSlot.id;
 
   // Language switcher
   const handleSelectLang = (mode) => {
@@ -84,7 +94,9 @@ export default function DurgaDarshanModal({ isOpen, onClose }) {
   // Copy mantra
   const handleCopyMantra = () => {
     const m = DARSHAN_MANTRAS.pranam;
-    const text = `${m.title}\n\n${m.sanskrit}\n\n${m.phonetic}\n\n${m.meaning[langMode] || m.meaning.bonglish}`;
+    const text = `${m.title}\n\n${m.sanskrit}\n\n${m.phonetic}\n\n${
+      m.meaning[langMode] || m.meaning.bonglish
+    }`;
     navigator.clipboard.writeText(text);
     setCopiedMantra(true);
     setTimeout(() => setCopiedMantra(false), 2200);
@@ -92,7 +104,11 @@ export default function DurgaDarshanModal({ isOpen, onClose }) {
 
   // Share to WhatsApp
   const handleShare = () => {
-    const text = `🪷 শ্রীশ্রী দুর্গা দর্শন ২০২৬ 🪷\n${viewedSlot.nameBn}\nসময়: ${viewedSlot.timeRange}\n\n${viewedSlot.ritual[langMode] || viewedSlot.ritual.bonglish}\n\nআজকের মহালয়া ও দুর্গাপূজা দর্শন শুনুন এবং দেখুন: ${window.location.href}`;
+    const text = `🪷 শ্রীশ্রী দুর্গা দর্শন ২০২৬ 🪷\n${viewedSlot.titleBn || viewedSlot.nameBn}\nস্থান: ${
+      viewedSlot.pandalLocation || "কলকাতা"
+    }\nসময়: ${viewedSlot.timeRange}\n\n${
+      viewedSlot.ritual[langMode] || viewedSlot.ritual.bonglish
+    }\n\nআজকের মহালয়া ও দুর্গাপূজা দর্শন শুনুন এবং দেখুন: ${window.location.href}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
   };
 
@@ -114,6 +130,15 @@ export default function DurgaDarshanModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
+  const festivalDaysList = [
+    { key: "devipaksha", nameBn: "দেবীপক্ষ", nameBonglish: "Devipaksha" },
+    { key: "shashthi", nameBn: "মহাষষ্ঠী", nameBonglish: "Shashthi" },
+    { key: "saptami", nameBn: "মহাসপ্তমী", nameBonglish: "Saptami" },
+    { key: "ashtami", nameBn: "মহাষ্টমী", nameBonglish: "Ashtami" },
+    { key: "navami", nameBn: "মহ Navami", nameBonglish: "Navami" },
+    { key: "dashami", nameBn: "বিজয়া দশমী", nameBonglish: "Dashami" },
+  ];
+
   return (
     <div
       role="dialog"
@@ -132,16 +157,16 @@ export default function DurgaDarshanModal({ isOpen, onClose }) {
         >
           <img
             src={viewedSlot.image}
-            alt={viewedSlot.nameBn}
+            alt={viewedSlot.titleBn || viewedSlot.nameBn}
             className="w-full h-full object-contain object-center drop-shadow-[0_0_50px_rgba(255,123,26,0.5)]"
           />
           <div className="absolute top-4 right-4 bg-black/70 backdrop-blur-md px-4 py-2 rounded-full border border-orange-500/50 text-amber-200 text-xs flex items-center gap-2">
             <span>✕ প্রস্থান (Click anywhere or ESC to exit)</span>
           </div>
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-md px-5 py-2.5 rounded-full border border-orange-500/50 text-amber-200 text-sm font-medium flex items-center gap-3">
-            <span>{viewedSlot.icon} {viewedSlot.nameBn}</span>
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-md px-5 py-2.5 rounded-full border border-orange-500/50 text-amber-200 text-sm font-medium flex items-center gap-3 whitespace-nowrap max-w-[90vw] truncate">
+            <span>{viewedSlot.icon} {viewedSlot.titleBn || viewedSlot.nameBn}</span>
             <span className="text-orange-400">•</span>
-            <span className="text-orange-300/80">{viewedSlot.timeRange}</span>
+            <span className="text-orange-300/80">{viewedSlot.pandalLocation}</span>
           </div>
         </div>
       ) : (
@@ -166,16 +191,16 @@ export default function DurgaDarshanModal({ isOpen, onClose }) {
                     {langMode === "bn" && "স্বর্গীয় চার প্রহর দুর্গা দর্শন ২০২৬"}
                     {langMode === "bonglish" && "Living 4-Prahar Durga Darshan 2026"}
                     {langMode === "en" && "Sacred Living Durga Darshan 2026"}
-                    
+
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono bg-red-950/80 text-red-300 border border-red-500/40 animate-pulse">
                       <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
                       LIVE
                     </span>
                   </h2>
                   <p className="text-[11px] sm:text-xs text-orange-200/65 truncate">
-                    {langMode === "bn" && "দিনে ৪ বার তিথি অনুযায়ী স্বয়ংক্রিয় রূপবদল • ভোর, দুপুর, সন্ধ্যা ও নিশীথ"}
-                    {langMode === "bonglish" && "Automatically shifts 4 times daily • Dawn, Midday, Evening & Midnight"}
-                    {langMode === "en" && "Autonomous 4-phase daily darshan • Morning, Midday, Twilight & Midnight"}
+                    {langMode === "bn" && "দিনে ৪ বার তিথি অনুযায়ী স্বয়ংক্রিয় রূপবদল • কলকাতার ঐতিহ্যবাহী প্যান্ডেল ও সাবেক রূপ"}
+                    {langMode === "bonglish" && "4 unique daily transformations • Iconic Kolkata Heritage Pandals & Pratimas"}
+                    {langMode === "en" && "4 autonomous daily shifts • Iconic Kolkata Pandals & Traditional Sabeki Idols"}
                   </p>
                 </div>
               </div>
@@ -190,7 +215,7 @@ export default function DurgaDarshanModal({ isOpen, onClose }) {
               </button>
             </div>
 
-            {/* 3-Script Mode Switcher */}
+            {/* Script Mode Switcher + Back to Live button */}
             <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#ff7b1a]/15">
               <span className="text-[10px] sm:text-[11px] text-orange-300/75 uppercase tracking-wider font-mono">
                 Script / ভাষা:
@@ -230,11 +255,39 @@ export default function DurgaDarshanModal({ isOpen, onClose }) {
             </div>
           </div>
 
-          {/* 2. PRAHAR STEPPER TABS (4 Quarters of the Day) */}
+          {/* 1.5 FESTIVAL DAY SELECTOR (Mahalaya, Shashthi, Saptami, Ashtami, Navami, Dashami) */}
+          <div className="px-4 sm:px-6 py-2 bg-[#120703] border-b border-[#ff7b1a]/20 flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-shrink-0">
+            <span className="text-[10px] font-mono text-orange-400/80 uppercase tracking-wider flex-shrink-0 pr-1">
+              📅 তিথি / Day:
+            </span>
+            {festivalDaysList.map((day) => {
+              const isSelected = day.key === selectedDayKey;
+              const isToday = day.key === currentDayKey;
+
+              return (
+                <button
+                  key={day.key}
+                  onClick={() => setSelectedDayKey(day.key)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-medium transition-all cursor-pointer flex-shrink-0 border flex items-center gap-1 ${
+                    isSelected
+                      ? "bg-[#ff7b1a] text-black font-bold border-[#ffbe76] shadow-[0_0_10px_rgba(255,123,26,0.6)]"
+                      : "bg-black/50 border-orange-500/25 text-orange-200/75 hover:text-white hover:border-orange-500/50"
+                  }`}
+                >
+                  <span>{langMode === "bn" ? day.nameBn : day.nameBonglish}</span>
+                  {isToday && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* 2. PRAHAR STEPPER TABS (4 Quarters of the Selected Day) */}
           <div className="px-4 sm:px-6 py-2.5 bg-[#0a0503] border-b border-[#ff7b1a]/20 flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar flex-shrink-0">
-            {todayTimeline.map((slot) => {
+            {PRAHAR_SLOTS.map((slot) => {
               const isSelected = slot.id === selectedSlotId;
-              const isLive = slot.id === currentSlot.id;
+              const isLive = selectedDayKey === currentDayKey && slot.id === currentSlot.id;
 
               return (
                 <button
@@ -248,7 +301,11 @@ export default function DurgaDarshanModal({ isOpen, onClose }) {
                 >
                   <span>{slot.icon}</span>
                   <span className="whitespace-nowrap">
-                    {langMode === "bn" ? slot.nameBn : langMode === "bonglish" ? slot.nameBonglish : slot.nameEn}
+                    {langMode === "bn"
+                      ? slot.nameBn
+                      : langMode === "bonglish"
+                      ? slot.nameBonglish
+                      : slot.nameEn}
                   </span>
                   {isLive && (
                     <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping ml-0.5" />
@@ -259,8 +316,11 @@ export default function DurgaDarshanModal({ isOpen, onClose }) {
 
             {!isViewingLiveSlot && (
               <button
-                onClick={() => setSelectedSlotId(currentSlot.id)}
-                className="ml-auto px-2.5 py-1 rounded-lg text-[10px] font-mono bg-red-950/80 text-red-300 border border-red-500/50 hover:bg-red-900 transition-colors flex items-center gap-1 whitespace-nowrap cursor-pointer"
+                onClick={() => {
+                  setSelectedDayKey(currentDayKey);
+                  setSelectedSlotId(currentSlot.id);
+                }}
+                className="ml-auto px-2.5 py-1 rounded-lg text-[10px] font-mono bg-red-950/80 text-red-300 border border-red-500/50 hover:bg-red-900 transition-colors flex items-center gap-1 whitespace-nowrap cursor-pointer flex-shrink-0"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
                 {langMode === "bn" ? "লাইভ দর্শনে ফিরুন" : "Back to Live"}
@@ -274,8 +334,8 @@ export default function DurgaDarshanModal({ isOpen, onClose }) {
             <div className="relative w-full aspect-video sm:h-[42vh] rounded-2xl overflow-hidden border border-[#ff7b1a]/50 shadow-[0_0_30px_rgba(255,123,26,0.25)] group bg-black flex-shrink-0">
               <img
                 src={viewedSlot.image}
-                alt={viewedSlot.nameBn}
-                className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-102"
+                alt={viewedSlot.titleBn || viewedSlot.nameBn}
+                className="w-full h-full object-cover object-[center_35%] transition-transform duration-700 group-hover:scale-102"
               />
 
               {/* Shimmer & Ambient Vignette */}
@@ -307,11 +367,23 @@ export default function DurgaDarshanModal({ isOpen, onClose }) {
               {/* Bottom Image Overlay Details */}
               <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between gap-2 pointer-events-none">
                 <div>
+                  <div className="text-[11px] sm:text-xs text-amber-400 font-mono tracking-wide flex items-center gap-1 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+                    <span>📍</span>
+                    <span>{viewedSlot.pandalLocation || "কলকাতা"}</span>
+                  </div>
                   <h3 className="text-base sm:text-xl font-bold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-                    {langMode === "bn" ? viewedSlot.nameBn : langMode === "bonglish" ? viewedSlot.nameBonglish : viewedSlot.nameEn}
+                    {langMode === "bn"
+                      ? viewedSlot.titleBn || viewedSlot.nameBn
+                      : langMode === "bonglish"
+                      ? viewedSlot.titleBonglish || viewedSlot.nameBonglish
+                      : viewedSlot.titleEn || viewedSlot.nameEn}
                   </h3>
                   <p className="text-xs sm:text-sm text-orange-200/90 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)] line-clamp-1">
-                    {viewedSlot.significance[langMode] || viewedSlot.significance.bonglish}
+                    {langMode === "bn"
+                      ? viewedSlot.ritualBn || viewedSlot.ritual?.bn
+                      : langMode === "bonglish"
+                      ? viewedSlot.ritualBonglish || viewedSlot.ritual?.bonglish
+                      : viewedSlot.ritualEn || viewedSlot.ritual?.en}
                   </p>
                 </div>
               </div>
@@ -331,7 +403,11 @@ export default function DurgaDarshanModal({ isOpen, onClose }) {
                   </div>
                   <div className="text-sm font-bold text-amber-100 flex items-center gap-1.5">
                     <span>{countdown.nextSlot?.icon}</span>
-                    <span>{langMode === "bn" ? countdown.nextSlot?.nameBn : countdown.nextSlot?.nameBonglish}</span>
+                    <span>
+                      {langMode === "bn"
+                        ? countdown.nextSlot?.nameBn
+                        : countdown.nextSlot?.nameBonglish}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -356,18 +432,24 @@ export default function DurgaDarshanModal({ isOpen, onClose }) {
                   <span>• Rituals</span>
                 </div>
                 <p className="text-xs sm:text-sm text-orange-100/90 leading-relaxed">
-                  {viewedSlot.ritual[langMode] || viewedSlot.ritual.bonglish}
+                  {langMode === "bn"
+                    ? viewedSlot.ritualBn || viewedSlot.ritual?.bn
+                    : langMode === "bonglish"
+                    ? viewedSlot.ritualBonglish || viewedSlot.ritual?.bonglish
+                    : viewedSlot.ritualEn || viewedSlot.ritual?.en}
                 </p>
               </div>
 
               {/* Devotional Significance Box */}
               <div className="p-3.5 rounded-2xl bg-black/50 border border-orange-500/25 flex flex-col gap-1.5">
                 <div className="flex items-center gap-2 text-xs font-bold text-amber-300 uppercase tracking-wider font-mono">
-                  <span>✨ আধ্যাত্মিক মাহাত্ম্য</span>
-                  <span>• Significance</span>
+                  <span>✨ প্যান্ডেল ও সাবেকী ঐতিহ্য</span>
+                  <span>• Heritage</span>
                 </div>
                 <p className="text-xs sm:text-sm text-orange-100/90 leading-relaxed">
-                  {viewedSlot.significance[langMode] || viewedSlot.significance.bonglish}
+                  {viewedSlot.pandalLocation
+                    ? `মণ্ডপ স্থান: ${viewedSlot.pandalLocation}। বাংলার সংস্কৃতি ও শতাব্দীর ঐতিহ্যবাহী দুর্গোৎসবের জীবন্ত রূপ।`
+                    : "কলকাতার শতাব্দীপ্রাচীন দুর্গাপূজার ঐতিহ্যবাহী সাবেকী ও থিম শিল্পকলার মেলবন্ধন।"}
                 </p>
               </div>
             </div>
