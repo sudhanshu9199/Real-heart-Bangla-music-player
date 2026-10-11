@@ -4,7 +4,9 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { useWakeLock } from "../utils/useWakeLock";
 import SacredContributionModal from "./SacredContributionModal";
 import DurgaPujaScheduleModal from "./DurgaPujaScheduleModal";
+import DurgaDarshanModal from "./DurgaDarshanModal";
 import { getFestivalRealtimeStatus } from "@/utils/durgaPujaRealtime";
+import { useLivingDarshan } from "@/utils/durgaDarshanEngine";
 
 const PWAContext = createContext({
   isInstallable: false,
@@ -17,6 +19,7 @@ const PWAContext = createContext({
   isSecureContext: true,
   openDiyaModal: () => {},
   openPujaSchedule: () => {},
+  openDarshanModal: () => {},
 });
 
 export const usePWA = () => useContext(PWAContext);
@@ -30,7 +33,9 @@ export default function PWAProvider({ children }) {
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [isDiyaModalOpen, setIsDiyaModalOpen] = useState(false);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const [isDarshanModalOpen, setIsDarshanModalOpen] = useState(false);
   const [realtime, setRealtime] = useState(() => getFestivalRealtimeStatus(new Date()));
+  const { currentSlot } = useLivingDarshan();
 
   // Periodic update for festival countdown
   useEffect(() => {
@@ -40,17 +45,23 @@ export default function PWAProvider({ children }) {
     return () => clearInterval(timer);
   }, []);
 
-  // Global listener for opening Diya modal and Puja Schedule modal from anywhere
+  // Global listener for opening Diya modal, Puja Schedule modal, and Darshan modal
   useEffect(() => {
     const handleOpenDiya = () => setIsDiyaModalOpen(true);
     const handleOpenSchedule = () => setIsScheduleModalOpen(true);
+    const handleOpenDarshan = () => setIsDarshanModalOpen(true);
+    const handleCloseDarshan = () => setIsDarshanModalOpen(false);
 
     window.addEventListener("open_diya_modal", handleOpenDiya);
     window.addEventListener("open_puja_schedule", handleOpenSchedule);
+    window.addEventListener("open_darshan_modal", handleOpenDarshan);
+    window.addEventListener("close_darshan_modal", handleCloseDarshan);
 
     return () => {
       window.removeEventListener("open_diya_modal", handleOpenDiya);
       window.removeEventListener("open_puja_schedule", handleOpenSchedule);
+      window.removeEventListener("open_darshan_modal", handleOpenDarshan);
+      window.removeEventListener("close_darshan_modal", handleCloseDarshan);
     };
   }, []);
 
@@ -175,12 +186,29 @@ export default function PWAProvider({ children }) {
         isSecureContext: isSecure,
         openDiyaModal: () => setIsDiyaModalOpen(true),
         openPujaSchedule: () => setIsScheduleModalOpen(true),
+        openDarshanModal: () => setIsDarshanModalOpen(true),
       }}
     >
       {children}
 
-      {/* Floating System Utilities (Puja Schedule + Light a Diya + Wake Lock + Install PWA badge) */}
+      {/* Floating System Utilities (Puja Schedule + Living Darshan + Light a Diya + Wake Lock + Install PWA badge) */}
       <div className="fixed top-[max(0.875rem,env(safe-area-inset-top))] right-3 sm:right-5 z-40 flex items-center gap-1.5 sm:gap-2 select-none pointer-events-auto">
+        {/* Sri Sri Durga Living 4-Prahar Darshan Trigger (Option B) */}
+        <button
+          onClick={() => setIsDarshanModalOpen(true)}
+          title="স্বর্গীয় চার প্রহর দুর্গা দর্শন (Live 4-Prahar Durga Darshan & Rituals)"
+          className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#2a0e05]/95 to-[#4d1908]/95 hover:from-[#3a1508] hover:to-[#61220a] border border-[#ff7b1a]/60 hover:border-[#ff7b1a] text-[#ffbe76] hover:text-white text-xs font-medium backdrop-blur-xl shadow-[0_0_16px_rgba(255,123,26,0.35)] transition-all duration-300 active:scale-95 cursor-pointer group flex-shrink-0"
+        >
+          <span className="text-xs group-hover:scale-110 transition-transform">🪷</span>
+          <span className="hidden lg:inline">শ্রীশ্রী দর্শন • Live Darshan</span>
+          <span className="hidden sm:inline lg:hidden">Live Darshan</span>
+          <span className="sm:hidden">দর্শন</span>
+          <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono bg-red-950/80 text-red-300 border border-red-500/50 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-ping" />
+            <span>{currentSlot?.icon}</span>
+          </span>
+        </button>
+
         {/* Durga Puja Multi-Modal Schedule Trigger (Inclusive for Pravasi Bengalis & Global Devotees) */}
         {/* Durga Puja Multi-Modal Schedule Trigger with Live Days Countdown */}
         <button
@@ -212,7 +240,7 @@ export default function PWAProvider({ children }) {
 
         {/* Offline indicator */}
         {!isOnline && (
-          <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-red-950/80 border border-red-700/60 backdrop-blur-md text-red-200 text-xs shadow-lg animate-pulse">
+          <div className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-red-950/80 border border-red-700/60 backdrop-blur-md text-red-200 text-xs shadow-lg animate-pulse">
             <span className="w-2 h-2 rounded-full bg-red-500"></span>
             <span className="hidden sm:inline">Offline Mode</span>
             <span className="sm:hidden">Offline</span>
@@ -288,6 +316,12 @@ export default function PWAProvider({ children }) {
       <DurgaPujaScheduleModal
         isOpen={isScheduleModalOpen}
         onClose={() => setIsScheduleModalOpen(false)}
+      />
+
+      {/* Sri Sri Durga Living 4-Prahar Darshan Modal */}
+      <DurgaDarshanModal
+        isOpen={isDarshanModalOpen}
+        onClose={() => setIsDarshanModalOpen(false)}
       />
     </PWAContext.Provider>
   );

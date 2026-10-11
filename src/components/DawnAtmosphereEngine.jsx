@@ -7,6 +7,7 @@ import FestiveLandscapeLayer from "./FestiveLandscapeLayer";
 import { calculateSolarState } from "@/utils/solarCalculator";
 import { getDawnAudioEngine } from "@/utils/audioEngine";
 
+import CelestialDarshanSkyLayer from "./CelestialDarshanSkyLayer";
 import MahalayaLoader from "./MahalayaLoader";
 import LivePresenceBadge from "./LivePresenceBadge";
 
@@ -76,6 +77,9 @@ export default function DawnAtmosphereEngine() {
         cloudDensity={1.0}
         windSpeed={1.0}
       />
+
+      {/* 1.5 Option A: Ethereal Celestial Darshan Sky Layer (4-Prahar Living Maa Durga in the Clouds) */}
+      <CelestialDarshanSkyLayer solarState={solarState} />
 
       {/* 2. Interactive Dual-Layer Landscape: Peaceful Dawn & Durga Puja Ziggling Reveal */}
       <FestiveLandscapeLayer />
