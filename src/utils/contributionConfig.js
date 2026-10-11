@@ -131,18 +131,47 @@ export const CONTRIBUTION_CONFIG = {
 
 /**
  * Builds standard UPI Universal Intent URL
- * Supported by Google Pay, PhonePe, Paytm, BHIM, Cred, and mobile browsers
+ * Strictly preserves literal '@' in VPA (NPCI specification requirement)
+ * Avoids %40 encoding which breaks GPay/PhonePe bank handle resolution
  */
 export function buildUpiIntentUrl({
   upiId = CONTRIBUTION_CONFIG.upiId,
   payeeName = CONTRIBUTION_CONFIG.payeeName,
   amount = 51,
-  note = CONTRIBUTION_CONFIG.defaultNote,
+  note = "Mahalaya Diya",
 } = {}) {
-  const cleanUpi = encodeURIComponent(upiId.trim());
+  // NPCI requires literal '@' in VPA address
+  const cleanUpi = upiId.trim().replace(/\s+/g, "");
   const cleanName = encodeURIComponent(payeeName.trim());
   const cleanNote = encodeURIComponent(note.trim());
   const cleanAmount = amount ? `&am=${amount}` : "";
 
   return `upi://pay?pa=${cleanUpi}&pn=${cleanName}${cleanAmount}&tn=${cleanNote}&cu=INR`;
 }
+
+/**
+ * Builds app-specific and universal UPI intent URLs
+ * Compatible with Google Pay, PhonePe, Paytm, BHIM, Cred, and mobile browsers
+ */
+export function buildAppUpiUrls({
+  upiId = CONTRIBUTION_CONFIG.upiId,
+  payeeName = CONTRIBUTION_CONFIG.payeeName,
+  amount = 51,
+  note = "Mahalaya Diya",
+} = {}) {
+  const cleanUpi = upiId.trim().replace(/\s+/g, "");
+  const cleanName = encodeURIComponent(payeeName.trim());
+  const cleanNote = encodeURIComponent(note.trim());
+  const cleanAmount = amount ? `&am=${amount}` : "";
+  const baseParams = `pa=${cleanUpi}&pn=${cleanName}${cleanAmount}&tn=${cleanNote}&cu=INR`;
+
+  return {
+    universal: `upi://pay?${baseParams}`,
+    gpay: `gpay://upi/pay?${baseParams}`,
+    phonepe: `phonepe://pay?${baseParams}`,
+    paytm: `paytmmp://pay?${baseParams}`,
+    bhim: `upi://pay?${baseParams}`,
+    cleanFallback: `upi://pay?pa=${cleanUpi}&pn=${cleanName}&cu=INR`,
+  };
+}
+
