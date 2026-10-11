@@ -54,7 +54,10 @@ export default function DawnAtmosphereEngine() {
   }, [solarState.altitude]);
 
   return (
-    <main suppressHydrationWarning className="relative w-screen h-screen overflow-hidden bg-black select-none font-sans">
+    <main
+      suppressHydrationWarning
+      className="relative w-screen h-screen h-[100dvh] min-h-[100dvh] overflow-hidden bg-black select-none font-sans"
+    >
       {/* 1. 4K High-Fidelity Living Sky Engine (Celestial Stars, 3-Tier Moving Clouds, Sun, Crepuscular Rays, Mist) */}
       {/* NOTE: landscape is set to false because FestiveLandscapeLayer provides the high-res illustrated townscape */}
       <AtmosphereCanvas

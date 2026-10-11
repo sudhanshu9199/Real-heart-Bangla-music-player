@@ -250,19 +250,19 @@ function rgb(c, a = 1) {
 function drawSky(ctx, w, h, horizonY, sunX, sunY, solar) {
   const { skyZenith, skyMid, skyHorizon } = solar.colors;
 
-  // 3-stop vertical atmosphere gradient
-  const grad = ctx.createLinearGradient(0, 0, 0, horizonY + 12);
+  // 4-stop vertical atmosphere gradient extending full canvas height
+  const grad = ctx.createLinearGradient(0, 0, 0, h);
   grad.addColorStop(0, rgb(skyZenith));
-  grad.addColorStop(0.38, rgb(skyZenith, 0.96));
-  grad.addColorStop(0.68, rgb(skyMid, 0.94));
-  grad.addColorStop(0.92, rgb(skyHorizon, 0.92));
+  grad.addColorStop(Math.min(0.42, (horizonY / h) * 0.65), rgb(skyZenith, 0.98));
+  grad.addColorStop(Math.min(0.68, (horizonY / h) * 0.92), rgb(skyMid, 0.95));
+  grad.addColorStop(Math.min(0.88, (horizonY / h) * 1.05), rgb(skyHorizon, 0.95));
   grad.addColorStop(1, rgb(skyHorizon));
 
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, w, horizonY + 12);
+  ctx.fillRect(0, 0, w, h);
 
   // Atmospheric scattering dome centered on the sun
-  const domeRadius = Math.max(w * 0.48, 480);
+  const domeRadius = Math.max(w * 0.55, 520);
   const domeY = Math.min(horizonY, sunY + 20);
   const domeGrad = ctx.createRadialGradient(sunX, domeY, 0, sunX, domeY, domeRadius);
 
@@ -282,7 +282,7 @@ function drawSky(ctx, w, h, horizonY, sunX, sunY, solar) {
   }
 
   ctx.fillStyle = domeGrad;
-  ctx.fillRect(0, 0, w, horizonY + 12);
+  ctx.fillRect(0, 0, w, h);
 }
 
 /**

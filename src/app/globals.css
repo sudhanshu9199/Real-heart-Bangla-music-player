@@ -12,13 +12,20 @@
   --font-mono: var(--font-geist-mono);
 }
 
+html,
 body {
+  height: 100%;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
   background: var(--background);
   color: var(--foreground);
   overflow: hidden;
   user-select: none;
   -webkit-font-smoothing: antialiased;
+  touch-action: pan-x pan-y;
 }
+
 
 /* Custom minimal scrollbar for HUD */
 ::-webkit-scrollbar {

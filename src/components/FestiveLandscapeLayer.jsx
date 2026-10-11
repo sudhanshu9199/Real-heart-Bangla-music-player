@@ -652,7 +652,7 @@ export default function FestiveLandscapeLayer() {
       {hintVisible && !swapToast && (
         <div
           ref={hintRef}
-          className="absolute top-16 sm:top-20 left-1/2 -translate-x-1/2 z-20 pointer-events-none transition-all duration-500 w-auto px-4 max-w-[92vw]"
+          className="absolute top-[max(4.25rem,calc(3.5rem+env(safe-area-inset-top,0px)))] sm:top-20 left-1/2 -translate-x-1/2 z-20 pointer-events-none transition-all duration-500 w-auto px-4 max-w-[92vw]"
         >
           <div className="flex items-center gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#0d0806]/90 border border-[#ff7b1a]/50 shadow-[0_0_24px_rgba(255,123,26,0.35),0_0_48px_rgba(255,123,26,0.12)] backdrop-blur-xl">
             <span className="w-2 h-2 rounded-full bg-gradient-to-r from-[#ff7b1a] to-[#ffd166] animate-ping flex-shrink-0" />

@@ -290,9 +290,9 @@ export default function DawnMusicPlayer() {
 
   return (
     <div
-      className="absolute bottom-5 sm:bottom-8 md:bottom-10 left-1/2 -translate-x-1/2 z-30 w-[95vw] sm:w-[92vw] max-w-2xl select-none"
+      className="fixed left-1/2 -translate-x-1/2 z-30 w-[94vw] sm:w-[92vw] max-w-2xl select-none"
       style={{
-        bottom: "calc(1.25rem + env(safe-area-inset-bottom, 0px))",
+        bottom: "max(1.125rem, calc(0.75rem + env(safe-area-inset-bottom, 0px)))",
       }}
       role="region"
       aria-label="Atmospheric Audio & Radio Player"
@@ -307,7 +307,7 @@ export default function DawnMusicPlayer() {
         aria-hidden={!showCapsules}
       >
         <div
-          className="inline-flex items-stretch gap-0 rounded-full bg-[#0c0806]/95 backdrop-blur-xl border-[1.5px] border-[#ff7b1a] shadow-[0_0_20px_rgba(255,123,26,0.35),0_0_40px_rgba(255,123,26,0.15),inset_0_0_10px_rgba(255,123,26,0.08)] p-1 overflow-hidden"
+          className="inline-flex items-stretch gap-0 rounded-full bg-[#0c0806]/95 backdrop-blur-xl border-[1.5px] border-[#ff7b1a] shadow-[0_0_20px_rgba(255,123,26,0.35),0_0_40px_rgba(255,123,26,0.15),inset_0_0_10px_rgba(255,123,26,0.08)] p-0.5 sm:p-1 overflow-hidden"
           role="tablist"
           aria-label="Audio Mode Selector"
         >
@@ -320,13 +320,13 @@ export default function DawnMusicPlayer() {
               e.stopPropagation();
               handleSelectSource("mahalaya");
             }}
-            className={`flex items-center justify-center gap-1.5 py-1 sm:py-1.5 px-3 sm:px-4 text-[11px] sm:text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer border-r border-[#ff7b1a]/40 rounded-l-full select-none ${
+            className={`flex items-center justify-center gap-1 sm:gap-1.5 py-1 sm:py-1.5 px-2.5 sm:px-4 text-[10px] sm:text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer border-r border-[#ff7b1a]/40 rounded-l-full select-none ${
               activeSourceId === "mahalaya"
                 ? "bg-[#ff7b1a] text-black font-bold shadow-[0_0_14px_rgba(255,123,26,0.7),inset_0_1px_2px_rgba(255,255,255,0.4)]"
                 : "text-orange-200/80 hover:text-white hover:bg-[#ff7b1a]/20"
             }`}
           >
-            <span className="text-[11px] sm:text-xs">💿</span>
+            <span className="text-[10px] sm:text-xs">💿</span>
             <span className="truncate">মহিষাসুরমর্দ্দিনী</span>
           </button>
 
@@ -339,13 +339,13 @@ export default function DawnMusicPlayer() {
               e.stopPropagation();
               handleSelectSource("bangla-radio");
             }}
-            className={`flex items-center justify-center gap-1.5 py-1 sm:py-1.5 px-3 sm:px-4 text-[11px] sm:text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer rounded-r-full select-none ${
+            className={`flex items-center justify-center gap-1 sm:gap-1.5 py-1 sm:py-1.5 px-2.5 sm:px-4 text-[10px] sm:text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer rounded-r-full select-none ${
               activeSourceId === "bangla-radio"
                 ? "bg-[#ff7b1a] text-black font-bold shadow-[0_0_14px_rgba(255,123,26,0.7),inset_0_1px_2px_rgba(255,255,255,0.4)]"
                 : "text-orange-200/80 hover:text-white hover:bg-[#ff7b1a]/20"
             }`}
           >
-            <span className="text-[11px] sm:text-xs">📻</span>
+            <span className="text-[10px] sm:text-xs">📻</span>
             <span className="truncate">কলকাতা রেডিও (India)</span>
             {activeSourceId === "bangla-radio" && isPlaying && (
               <span
@@ -372,7 +372,7 @@ export default function DawnMusicPlayer() {
         style={{
           touchAction: "none",
         }}
-        className={`relative flex items-center justify-between px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl bg-[#0c0806]/92 backdrop-blur-xl border-[1.5px] border-[#ff7b1a] transition-shadow duration-300 ${
+        className={`relative flex items-center justify-between px-2.5 py-2 sm:px-4 sm:py-3 rounded-2xl bg-[#0c0806]/94 backdrop-blur-xl border-[1.5px] border-[#ff7b1a] transition-shadow duration-300 ${
           isDragging
             ? "cursor-grabbing shadow-[0_15px_35px_rgba(255,123,26,0.5),0_0_65px_rgba(255,123,26,0.25)]"
             : "cursor-grab shadow-[0_0_25px_rgba(255,123,26,0.35),0_0_55px_rgba(255,123,26,0.15),inset_0_0_15px_rgba(255,123,26,0.08)] hover:shadow-[0_0_35px_rgba(255,123,26,0.5),0_0_65px_rgba(255,123,26,0.22)]"
@@ -419,7 +419,7 @@ export default function DawnMusicPlayer() {
 
           {/* THE ROTATING VINYL / CD DISC */}
           <div
-            className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-15 md:h-15 rounded-full border-[1.5px] border-[#ff7b1a] shadow-[0_0_16px_rgba(255,123,26,0.45)] flex items-center justify-center overflow-hidden bg-[#0a0503]"
+            className="relative w-11 h-11 sm:w-14 sm:h-14 md:w-15 md:h-15 rounded-full border-[1.5px] border-[#ff7b1a] shadow-[0_0_16px_rgba(255,123,26,0.45)] flex items-center justify-center overflow-hidden bg-[#0a0503]"
             style={{
               animationName: prefersReducedMotion ? "none" : "spin",
               animationDuration: "10s",
@@ -468,7 +468,7 @@ export default function DawnMusicPlayer() {
             />
 
             {/* Center Spindle Assembly: Metallic Brass Clamp & Spindle Core */}
-            <div className="relative z-10 w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full border border-[#ffbe76]/85 bg-gradient-to-tr from-[#1f1008] via-[#120804] to-[#2a170b] flex items-center justify-center shadow-[0_0_8px_rgba(255,123,26,0.6),inset_0_1px_3px_rgba(255,255,255,0.3)]">
+            <div className="relative z-10 w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 rounded-full border border-[#ffbe76]/85 bg-gradient-to-tr from-[#1f1008] via-[#120804] to-[#2a170b] flex items-center justify-center shadow-[0_0_8px_rgba(255,123,26,0.6),inset_0_1px_3px_rgba(255,255,255,0.3)]">
               <div className="w-1.5 h-1.5 rounded-full bg-[#070403] border border-orange-500/50 shadow-[inset_0_1px_2px_rgba(0,0,0,0.95)]" />
             </div>
           </div>
@@ -486,18 +486,18 @@ export default function DawnMusicPlayer() {
               ? "Hide options (ক্লিক করে লুকান)"
               : "Click to toggle options (অপশন দেখুন)"
           }
-          className="flex-1 mx-1.5 sm:mx-3 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl border border-[#ff7b1a]/70 bg-black/50 flex items-center justify-between min-w-0 shadow-[inset_0_0_10px_rgba(255,123,26,0.1)] cursor-pointer hover:border-[#ff7b1a] transition-colors"
+          className="flex-1 mx-1.5 sm:mx-3 px-2 sm:px-3 py-1 sm:py-2 rounded-xl border border-[#ff7b1a]/70 bg-black/50 flex items-center justify-between min-w-0 shadow-[inset_0_0_10px_rgba(255,123,26,0.1)] cursor-pointer hover:border-[#ff7b1a] transition-colors"
         >
-          <div className="flex flex-col min-w-0 pr-1.5">
+          <div className="flex flex-col min-w-0 pr-1">
             {activeSourceId === "mahalaya" ? (
               <>
                 <div className="flex items-center gap-1 min-w-0">
-                  <span className="text-xs sm:text-sm font-semibold tracking-wide text-[#ffbe76] truncate drop-shadow-[0_0_6px_rgba(255,190,118,0.4)]">
+                  <span className="text-[11px] sm:text-sm font-semibold tracking-tight sm:tracking-wide text-[#ffbe76] truncate drop-shadow-[0_0_6px_rgba(255,190,118,0.4)]">
                     <span className="hidden sm:inline">মহিষাসুরমর্দ্দিনী • </span>
                     {chapter.title || "মহিষাসুরমর্দ্দিনী"}
                   </span>
                 </div>
-                <span className="text-[10px] sm:text-xs text-orange-200/65 tracking-wider truncate">
+                <span className="text-[9.5px] sm:text-xs text-orange-200/65 tracking-wider truncate">
                   {formatTime(currentTime)} / {formatTime(duration)}
                   <span className="hidden sm:inline"> • {chapter.subtitle}</span>
                 </span>
@@ -505,32 +505,32 @@ export default function DawnMusicPlayer() {
             ) : (
               <>
                 <div className="flex items-center gap-1.5 min-w-0">
-                  <span className="text-xs sm:text-sm font-semibold tracking-wide text-[#ffbe76] truncate drop-shadow-[0_0_6px_rgba(255,190,118,0.4)]">
+                  <span className="text-[11px] sm:text-sm font-semibold tracking-tight sm:tracking-wide text-[#ffbe76] truncate drop-shadow-[0_0_6px_rgba(255,190,118,0.4)]">
                     {currentStation?.title || "আকাশবাণী কলকাতা"}
                   </span>
                   <span className="hidden sm:inline-flex px-1.5 py-0.5 rounded text-[9px] font-mono bg-orange-950/70 text-orange-300 border border-orange-500/30 flex-shrink-0">
                     {stationIndex + 1}/{KOLKATA_RADIO_STATIONS.length}
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 text-[10px] sm:text-xs tracking-wider truncate">
+                <div className="flex items-center gap-1 text-[9.5px] sm:text-xs tracking-wider truncate">
                   {radioState === "connecting" && (
                     <span className="text-amber-300/80 animate-pulse truncate">
-                      Connecting to Kolkata stream...
+                      Connecting...
                     </span>
                   )}
                   {radioState === "buffering" && (
                     <span className="text-amber-300/80 animate-pulse truncate">
-                      Buffering live broadcast...
+                      Buffering...
                     </span>
                   )}
                   {radioState === "reconnecting" && (
                     <span className="text-amber-400 animate-pulse truncate">
-                      Reconnecting to broadcast...
+                      Reconnecting...
                     </span>
                   )}
                   {radioState === "error" && (
                     <span className="text-red-400 flex items-center gap-1 truncate">
-                      Kolkata stream unavailable •
+                      Stream offline •
                       <button
                         onClick={handleRetryRadio}
                         className="underline text-orange-300 hover:text-white cursor-pointer"
@@ -541,13 +541,13 @@ export default function DawnMusicPlayer() {
                   )}
                   {radioState === "offline" && (
                     <span className="text-red-400 truncate">
-                      Offline • check connection
+                      Offline
                     </span>
                   )}
                   {(radioState === "playing" ||
                     radioState === "paused" ||
                     radioState === "idle") && (
-                    <div className="flex items-center gap-1.5 text-orange-200/70 truncate">
+                    <div className="flex items-center gap-1 text-orange-200/70 truncate">
                       <span className="inline-flex items-center gap-1 text-red-400 font-bold flex-shrink-0">
                         <span
                           className={`w-1.5 h-1.5 rounded-full bg-red-500 ${
@@ -559,7 +559,7 @@ export default function DawnMusicPlayer() {
                         <span>● LIVE</span>
                       </span>
                       <span className="truncate">
-                        • {currentStation?.frequency || "Kolkata, India"}
+                        • {currentStation?.frequency || "Kolkata"}
                       </span>
                     </div>
                   )}
@@ -570,18 +570,18 @@ export default function DawnMusicPlayer() {
 
           {/* Dynamic Equalizer Visualizer Bars synced directly with audio frequencies */}
           <div
-            className="flex items-end gap-1 h-5 sm:h-6 flex-shrink-0 pl-1"
+            className="flex items-end gap-0.5 sm:gap-1 h-4 sm:h-6 flex-shrink-0 pl-1"
             aria-hidden="true"
           >
             {equalizerBars.map((level, i) => {
-              const heightPx = Math.max(4, Math.round(level * 24));
+              const heightPx = Math.max(3, Math.round(level * 22));
               return (
                 <span
                   key={i}
                   style={{
-                    height: isPlaying ? `${heightPx}px` : "5px",
+                    height: isPlaying ? `${heightPx}px` : "4px",
                   }}
-                  className="w-1 rounded-full bg-gradient-to-t from-[#ff7b1a] via-[#ffa502] to-[#ffd199] shadow-[0_0_8px_#ff7b1a] transition-all duration-75"
+                  className="w-0.5 sm:w-1 rounded-full bg-gradient-to-t from-[#ff7b1a] via-[#ffa502] to-[#ffd199] shadow-[0_0_8px_#ff7b1a] transition-all duration-75"
                 />
               );
             })}
@@ -589,7 +589,7 @@ export default function DawnMusicPlayer() {
         </div>
 
         {/* RIGHT: Navigation & Play Controls (Interactive buttons ignore drag) */}
-        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 no-drag">
+        <div className="flex items-center gap-0.5 sm:gap-2 flex-shrink-0 no-drag">
           {/* Previous Button (<) — works for both Mahalaya Chapters and Kolkata Radio Channels */}
           <button
             onClick={handlePrev}
@@ -608,10 +608,10 @@ export default function DawnMusicPlayer() {
                   }`
                 : "Previous Chapter (পূর্ববর্তী অধ্যায়)"
             }
-            className="p-1.5 sm:p-2 rounded-lg text-[#ff7b1a] hover:text-[#ffbe76] hover:bg-orange-500/15 active:scale-95 transition-all duration-200 cursor-pointer"
+            className="p-1 sm:p-2 rounded-lg text-[#ff7b1a] hover:text-[#ffbe76] hover:bg-orange-500/15 active:scale-95 transition-all duration-200 cursor-pointer"
           >
             <svg
-              className="w-5 h-5 sm:w-6 sm:h-6 stroke-current drop-shadow-[0_0_8px_rgba(255,123,26,0.6)]"
+              className="w-4 h-4 sm:w-6 sm:h-6 stroke-current drop-shadow-[0_0_8px_rgba(255,123,26,0.6)]"
               viewBox="0 0 24 24"
               fill="none"
               strokeWidth="2.4"
@@ -627,11 +627,11 @@ export default function DawnMusicPlayer() {
             onClick={handleTogglePlay}
             aria-label={isPlaying ? "Pause audio" : "Play audio"}
             title={isPlaying ? "Pause" : "Play"}
-            className="p-1.5 sm:p-2 rounded-full border border-[#ff7b1a] text-[#ff7b1a] hover:text-[#ffe4cc] hover:bg-[#ff7b1a]/20 hover:shadow-[0_0_16px_#ff7b1a] active:scale-90 transition-all duration-200 cursor-pointer"
+            className="p-1 sm:p-2 rounded-full border border-[#ff7b1a] text-[#ff7b1a] hover:text-[#ffe4cc] hover:bg-[#ff7b1a]/20 hover:shadow-[0_0_16px_#ff7b1a] active:scale-90 transition-all duration-200 cursor-pointer"
           >
             {isPlaying ? (
               <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 fill-current drop-shadow-[0_0_8px_#ff7b1a]"
+                className="w-3.5 h-3.5 sm:w-5 sm:h-5 fill-current drop-shadow-[0_0_8px_#ff7b1a]"
                 viewBox="0 0 24 24"
               >
                 <rect x="6" y="5" width="4" height="14" rx="1" />
@@ -639,7 +639,7 @@ export default function DawnMusicPlayer() {
               </svg>
             ) : (
               <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 fill-current drop-shadow-[0_0_8px_#ff7b1a] translate-x-0.5"
+                className="w-3.5 h-3.5 sm:w-5 sm:h-5 fill-current drop-shadow-[0_0_8px_#ff7b1a] translate-x-0.5"
                 viewBox="0 0 24 24"
               >
                 <polygon points="6 4 20 12 6 20 6 4" />
@@ -664,10 +664,10 @@ export default function DawnMusicPlayer() {
                   }`
                 : "Next Chapter (পরবর্তী অধ্যায়)"
             }
-            className="p-1.5 sm:p-2 rounded-lg text-[#ff7b1a] hover:text-[#ffbe76] hover:bg-orange-500/15 active:scale-95 transition-all duration-200 cursor-pointer"
+            className="p-1 sm:p-2 rounded-lg text-[#ff7b1a] hover:text-[#ffbe76] hover:bg-orange-500/15 active:scale-95 transition-all duration-200 cursor-pointer"
           >
             <svg
-              className="w-5 h-5 sm:w-6 sm:h-6 stroke-current drop-shadow-[0_0_8px_rgba(255,123,26,0.6)]"
+              className="w-4 h-4 sm:w-6 sm:h-6 stroke-current drop-shadow-[0_0_8px_rgba(255,123,26,0.6)]"
               viewBox="0 0 24 24"
               fill="none"
               strokeWidth="2.4"
