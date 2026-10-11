@@ -286,6 +286,8 @@ export default function DawnMusicPlayer() {
   const currentCover =
     activeSourceId === "bangla-radio"
       ? AUDIO_SOURCES["bangla-radio"].artwork
+      : activeSourceId === "dhak"
+      ? AUDIO_SOURCES.dhak?.artwork || "/covers/cover-2.jpg"
       : chapter?.cover || "/covers/cover-1.jpg";
 
   return (
@@ -358,7 +360,29 @@ export default function DawnMusicPlayer() {
             )}
           </button>
 
-          {/* Capsule 3: প্রদীপ অর্ঘ্য (Light a Diya / Patronage) */}
+          {/* Capsule 3: উৎসবের ঢাক (Dhak Music) */}
+          <button
+            role="tab"
+            aria-selected={activeSourceId === "dhak"}
+            aria-label="Festive Bengali Durga Puja Dhak Music"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSelectSource("dhak");
+            }}
+            className={`flex items-center justify-center gap-1 sm:gap-1.5 py-1 sm:py-1.5 px-2.5 sm:px-3 text-[10px] sm:text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer border-r border-[#ff7b1a]/40 select-none ${
+              activeSourceId === "dhak"
+                ? "bg-[#ff7b1a] text-black font-bold shadow-[0_0_14px_rgba(255,123,26,0.7),inset_0_1px_2px_rgba(255,255,255,0.4)]"
+                : "text-orange-200/80 hover:text-white hover:bg-[#ff7b1a]/20"
+            }`}
+          >
+            <span className={`text-[10px] sm:text-xs ${activeSourceId === "dhak" && isPlaying ? "animate-bounce" : ""}`}>🥁</span>
+            <span className="truncate">ঢাকের বোল</span>
+            {activeSourceId === "dhak" && isPlaying && (
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 ml-0.5 shadow-[0_0_6px_#10b981] animate-pulse" />
+            )}
+          </button>
+
+          {/* Capsule 4: প্রদীপ অর্ঘ্য (Light a Diya / Patronage) */}
           <button
             role="tab"
             aria-label="Light a Sacred Diya & Support Soundscape"
@@ -366,10 +390,25 @@ export default function DawnMusicPlayer() {
               e.stopPropagation();
               window.dispatchEvent(new Event("open_diya_modal"));
             }}
-            className="flex items-center justify-center gap-1 sm:gap-1.5 py-1 sm:py-1.5 px-2.5 sm:px-3 text-[10px] sm:text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer rounded-r-full select-none text-amber-200/90 hover:text-white hover:bg-[#ff7b1a]/30 group"
+            className="flex items-center justify-center gap-1 sm:gap-1.5 py-1 sm:py-1.5 px-2.5 sm:px-3 text-[10px] sm:text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer border-r border-[#ff7b1a]/40 select-none text-amber-200/90 hover:text-white hover:bg-[#ff7b1a]/30 group"
           >
             <span className="text-[10px] sm:text-xs animate-pulse">🪔</span>
             <span className="truncate">প্রদীপ অর্ঘ্য</span>
+          </button>
+
+          {/* Capsule 5: পুজোর নির্ঘণ্ট (Durga Puja Schedule & Rituals) */}
+          <button
+            role="tab"
+            aria-label="Bengali Durga Puja Schedule & Daily Rituals"
+            onClick={(e) => {
+              e.stopPropagation();
+              window.dispatchEvent(new Event("open_puja_schedule"));
+            }}
+            className="flex items-center justify-center gap-1 sm:gap-1.5 py-1 sm:py-1.5 px-2.5 sm:px-3 text-[10px] sm:text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer rounded-r-full select-none text-amber-200/90 hover:text-white hover:bg-[#ff7b1a]/30 group"
+          >
+            <span className="text-[10px] sm:text-xs group-hover:scale-110 transition-transform">📜</span>
+            <span className="truncate hidden sm:inline">নির্ঘণ্ট • Schedule</span>
+            <span className="truncate sm:hidden">Schedule</span>
           </button>
         </div>
       </div>
@@ -514,6 +553,21 @@ export default function DawnMusicPlayer() {
                 <span className="text-[9.5px] sm:text-xs text-orange-200/65 tracking-wider truncate">
                   {formatTime(currentTime)} / {formatTime(duration)}
                   <span className="hidden sm:inline"> • {chapter.subtitle}</span>
+                </span>
+              </>
+            ) : activeSourceId === "dhak" ? (
+              <>
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className="text-[11px] sm:text-sm font-semibold tracking-tight sm:tracking-wide text-[#ffbe76] truncate drop-shadow-[0_0_6px_rgba(255,190,118,0.4)]">
+                    🥁 উৎসবের ঢাকের বোল
+                  </span>
+                  <span className="hidden sm:inline-flex px-1.5 py-0.5 rounded text-[9px] font-mono bg-red-950/70 text-red-300 border border-red-500/30 flex-shrink-0 animate-pulse">
+                    PUJA DHAK
+                  </span>
+                </div>
+                <span className="text-[9.5px] sm:text-xs text-orange-200/65 tracking-wider truncate">
+                  {formatTime(currentTime)} / {formatTime(duration)}
+                  <span className="hidden sm:inline"> • ঐতিহ্যবাহী শারদীয়া বাদ্য</span>
                 </span>
               </>
             ) : (

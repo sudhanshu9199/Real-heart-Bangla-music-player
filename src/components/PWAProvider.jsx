@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useWakeLock } from "../utils/useWakeLock";
 import SacredContributionModal from "./SacredContributionModal";
+import DurgaPujaScheduleModal from "./DurgaPujaScheduleModal";
+import { getFestivalRealtimeStatus } from "@/utils/durgaPujaRealtime";
 
 const PWAContext = createContext({
   isInstallable: false,
@@ -14,6 +16,7 @@ const PWAContext = createContext({
   isOnline: true,
   isSecureContext: true,
   openDiyaModal: () => {},
+  openPujaSchedule: () => {},
 });
 
 export const usePWA = () => useContext(PWAContext);
@@ -26,12 +29,29 @@ export default function PWAProvider({ children }) {
   const [isSecure, setIsSecure] = useState(true);
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [isDiyaModalOpen, setIsDiyaModalOpen] = useState(false);
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const [realtime, setRealtime] = useState(() => getFestivalRealtimeStatus(new Date()));
 
-  // Global listener for opening Diya modal from anywhere
+  // Periodic update for festival countdown
   useEffect(() => {
-    const handleOpen = () => setIsDiyaModalOpen(true);
-    window.addEventListener("open_diya_modal", handleOpen);
-    return () => window.removeEventListener("open_diya_modal", handleOpen);
+    const timer = setInterval(() => {
+      setRealtime(getFestivalRealtimeStatus(new Date()));
+    }, 10000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Global listener for opening Diya modal and Puja Schedule modal from anywhere
+  useEffect(() => {
+    const handleOpenDiya = () => setIsDiyaModalOpen(true);
+    const handleOpenSchedule = () => setIsScheduleModalOpen(true);
+
+    window.addEventListener("open_diya_modal", handleOpenDiya);
+    window.addEventListener("open_puja_schedule", handleOpenSchedule);
+
+    return () => {
+      window.removeEventListener("open_diya_modal", handleOpenDiya);
+      window.removeEventListener("open_puja_schedule", handleOpenSchedule);
+    };
   }, []);
 
   // Screen Wake Lock hook
@@ -154,12 +174,31 @@ export default function PWAProvider({ children }) {
         isOnline,
         isSecureContext: isSecure,
         openDiyaModal: () => setIsDiyaModalOpen(true),
+        openPujaSchedule: () => setIsScheduleModalOpen(true),
       }}
     >
       {children}
 
-      {/* Floating System Utilities (Light a Diya + Wake Lock + Install PWA badge with Mobile Safe-Area Support) */}
+      {/* Floating System Utilities (Puja Schedule + Light a Diya + Wake Lock + Install PWA badge) */}
       <div className="fixed top-[max(0.875rem,env(safe-area-inset-top))] right-3 sm:right-5 z-40 flex items-center gap-1.5 sm:gap-2 select-none pointer-events-auto">
+        {/* Durga Puja Multi-Modal Schedule Trigger (Inclusive for Pravasi Bengalis & Global Devotees) */}
+        {/* Durga Puja Multi-Modal Schedule Trigger with Live Days Countdown */}
+        <button
+          onClick={() => setIsScheduleModalOpen(true)}
+          title="বাঙালির দুর্গাপূজা নির্ঘণ্ট ২০২৬ (Durga Puja Schedule, Spoken Bengali & Live Countdowns)"
+          className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#200e05]/95 to-[#3d1808]/95 hover:from-[#311608] hover:to-[#52200a] border border-[#ff7b1a]/60 hover:border-[#ff7b1a] text-[#ffbe76] hover:text-white text-xs font-medium backdrop-blur-xl shadow-[0_0_16px_rgba(255,123,26,0.3)] transition-all duration-300 active:scale-95 cursor-pointer group flex-shrink-0"
+        >
+          <span className="text-xs group-hover:scale-110 transition-transform">📜</span>
+          <span className="hidden md:inline">পুজোর নির্ঘণ্ট • Schedule</span>
+          <span className="hidden sm:inline md:hidden">Pujo Schedule</span>
+          <span className="sm:hidden">Schedule</span>
+          {realtime?.mainCountdown && !realtime.mainCountdown.isPast && (
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono bg-[#ff7b1a]/25 text-[#ffd199] border border-[#ff7b1a]/40 shadow-[0_0_8px_rgba(255,123,26,0.4)]">
+              {realtime.mainCountdown.days}d left
+            </span>
+          )}
+        </button>
+
         {/* Sacred Patronage / Light a Diya Button */}
         <button
           onClick={() => setIsDiyaModalOpen(true)}
@@ -243,6 +282,12 @@ export default function PWAProvider({ children }) {
       <SacredContributionModal
         isOpen={isDiyaModalOpen}
         onClose={() => setIsDiyaModalOpen(false)}
+      />
+
+      {/* Durga Puja Complete Bengali Schedule Modal */}
+      <DurgaPujaScheduleModal
+        isOpen={isScheduleModalOpen}
+        onClose={() => setIsScheduleModalOpen(false)}
       />
     </PWAContext.Provider>
   );

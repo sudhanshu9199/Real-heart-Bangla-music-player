@@ -133,4 +133,14 @@ export const AUDIO_SOURCES = {
     metadataUrl: process.env.NEXT_PUBLIC_BANGLA_RADIO_METADATA_URL || null,
     artwork: "/covers/radio-bangla.jpg",
   },
+  dhak: {
+    id: "dhak",
+    type: "recording",
+    title: "উৎসবের ঢাকের বোল",
+    titleBonglish: "Sharodiya Dhak",
+    subtitle: "Authentic Bengali Durga Puja Dhak Rhythm",
+    streamUrl: "/Dhak-music.mp3",
+    protocol: "file",
+    artwork: "/covers/cover-2.jpg",
+  },
 };
