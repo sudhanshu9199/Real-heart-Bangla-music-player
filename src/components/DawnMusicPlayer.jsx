@@ -339,14 +339,14 @@ export default function DawnMusicPlayer() {
               e.stopPropagation();
               handleSelectSource("bangla-radio");
             }}
-            className={`flex items-center justify-center gap-1 sm:gap-1.5 py-1 sm:py-1.5 px-2.5 sm:px-4 text-[10px] sm:text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer rounded-r-full select-none ${
+            className={`flex items-center justify-center gap-1 sm:gap-1.5 py-1 sm:py-1.5 px-2.5 sm:px-4 text-[10px] sm:text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer border-r border-[#ff7b1a]/40 select-none ${
               activeSourceId === "bangla-radio"
                 ? "bg-[#ff7b1a] text-black font-bold shadow-[0_0_14px_rgba(255,123,26,0.7),inset_0_1px_2px_rgba(255,255,255,0.4)]"
                 : "text-orange-200/80 hover:text-white hover:bg-[#ff7b1a]/20"
             }`}
           >
             <span className="text-[10px] sm:text-xs">📻</span>
-            <span className="truncate">কলকাতা রেডিও (India)</span>
+            <span className="truncate">কলকাতা রেডিও</span>
             {activeSourceId === "bangla-radio" && isPlaying && (
               <span
                 className={`w-1.5 h-1.5 rounded-full ${
@@ -356,6 +356,20 @@ export default function DawnMusicPlayer() {
                 }`}
               />
             )}
+          </button>
+
+          {/* Capsule 3: প্রদীপ অর্ঘ্য (Light a Diya / Patronage) */}
+          <button
+            role="tab"
+            aria-label="Light a Sacred Diya & Support Soundscape"
+            onClick={(e) => {
+              e.stopPropagation();
+              window.dispatchEvent(new Event("open_diya_modal"));
+            }}
+            className="flex items-center justify-center gap-1 sm:gap-1.5 py-1 sm:py-1.5 px-2.5 sm:px-3 text-[10px] sm:text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer rounded-r-full select-none text-amber-200/90 hover:text-white hover:bg-[#ff7b1a]/30 group"
+          >
+            <span className="text-[10px] sm:text-xs animate-pulse">🪔</span>
+            <span className="truncate">প্রদীপ অর্ঘ্য</span>
           </button>
         </div>
       </div>

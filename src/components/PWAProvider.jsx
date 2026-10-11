@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useWakeLock } from "../utils/useWakeLock";
+import SacredContributionModal from "./SacredContributionModal";
 
 const PWAContext = createContext({
   isInstallable: false,
@@ -12,6 +13,7 @@ const PWAContext = createContext({
   toggleWakeLock: () => {},
   isOnline: true,
   isSecureContext: true,
+  openDiyaModal: () => {},
 });
 
 export const usePWA = () => useContext(PWAContext);
@@ -23,6 +25,14 @@ export default function PWAProvider({ children }) {
   const [isOnline, setIsOnline] = useState(true);
   const [isSecure, setIsSecure] = useState(true);
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [isDiyaModalOpen, setIsDiyaModalOpen] = useState(false);
+
+  // Global listener for opening Diya modal from anywhere
+  useEffect(() => {
+    const handleOpen = () => setIsDiyaModalOpen(true);
+    window.addEventListener("open_diya_modal", handleOpen);
+    return () => window.removeEventListener("open_diya_modal", handleOpen);
+  }, []);
 
   // Screen Wake Lock hook
   const {
@@ -143,12 +153,24 @@ export default function PWAProvider({ children }) {
         requestWakeLock,
         isOnline,
         isSecureContext: isSecure,
+        openDiyaModal: () => setIsDiyaModalOpen(true),
       }}
     >
       {children}
 
-      {/* Floating System Utilities (Install PWA badge + Wake Lock pill with Mobile Safe-Area Support) */}
+      {/* Floating System Utilities (Light a Diya + Wake Lock + Install PWA badge with Mobile Safe-Area Support) */}
       <div className="fixed top-[max(0.875rem,env(safe-area-inset-top))] right-3 sm:right-5 z-40 flex items-center gap-1.5 sm:gap-2 select-none pointer-events-auto">
+        {/* Sacred Patronage / Light a Diya Button */}
+        <button
+          onClick={() => setIsDiyaModalOpen(true)}
+          title="Light a Sacred Diya & Support the Soundscape (প্রদীপ জ্বালান)"
+          className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#2a1306]/90 to-[#451e08]/90 hover:from-[#3d1a08] hover:to-[#5c280b] border border-[#ff7b1a]/60 hover:border-[#ff7b1a] text-[#ffbe76] hover:text-white text-xs font-medium backdrop-blur-xl shadow-[0_0_16px_rgba(255,123,26,0.3)] transition-all duration-300 active:scale-95 cursor-pointer group flex-shrink-0"
+        >
+          <span className="text-xs group-hover:scale-110 transition-transform animate-pulse">🪔</span>
+          <span className="hidden sm:inline">Light a Diya</span>
+          <span className="sm:hidden">Diya</span>
+        </button>
+
         {/* Offline indicator */}
         {!isOnline && (
           <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-red-950/80 border border-red-700/60 backdrop-blur-md text-red-200 text-xs shadow-lg animate-pulse">
@@ -225,6 +247,12 @@ export default function PWAProvider({ children }) {
           </div>
         )}
       </div>
+
+      {/* Sacred Patronage / Contribution Modal */}
+      <SacredContributionModal
+        isOpen={isDiyaModalOpen}
+        onClose={() => setIsDiyaModalOpen(false)}
+      />
     </PWAContext.Provider>
   );
 }
