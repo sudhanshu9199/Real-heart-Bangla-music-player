@@ -6,20 +6,26 @@ import { getDawnAudioEngine } from "@/utils/audioEngine";
 
 /**
  * SacredContributionModal — 2026 Cultural Psychology & Indian Consumer Donation Engine
- * - Auspicious Indian Shagun Tiers (₹21, ₹51, ₹101, ₹251)
- * - Live Devotee Social Proof Ticker (Bandwagon & Communal Validation)
+ * - Bilingual Typography (Bengali + English) tailored for both Resident & Probashi Bengalis
+ * - Authentic Indian Metros (Bengaluru, Delhi NCR, Mumbai, Kolkata, Pune) — zero non-UPI locations
+ * - 40+ Rich Devotee Pool with dynamic shuffle and anti-repetition engine
+ * - Auspicious Indian Shagun Tiers (₹21, ₹51, ₹101, ₹251) with no text clipping
  * - 1-Click Mobile UPI Deep Links for PhonePe, Google Pay, Paytm, and BHIM
- * - Personalized "Sankalp" Name Dedication for divine blessing
- * - Verified Kotak Mahindra Bank Trust Architecture
+ * - Personalized "Sankalp" Name Dedication with instant optimistic live-ticker update
+ * - Verified Kotak Mahindra Bank Trust Seal
  * - Fullscreen Golden Diya & Marigold Celebration Canvas
  * - Festive WhatsApp Sharing Loop for viral family blessings
  */
 export default function SacredContributionModal({ isOpen, onClose }) {
-  const [selectedTier, setSelectedTier] = useState(CONTRIBUTION_CONFIG.tiers[1]); // default: Pushpanjali Arghya (₹51)
+  // Default selected tier: ₹51 (Pushpanjali Arghya - Popular choice)
+  const [selectedTier, setSelectedTier] = useState(CONTRIBUTION_CONFIG.tiers[1]);
   const [customAmount, setCustomAmount] = useState("");
   const [devoteeName, setDevoteeName] = useState("");
   const [copied, setCopied] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  
+  // Shuffled live ticker pool to prevent repetitive name loops
+  const [tickerList, setTickerList] = useState([]);
   const [tickerIndex, setTickerIndex] = useState(0);
   const [qrLoaded, setQrLoaded] = useState(false);
   const [activeQrSrc, setActiveQrSrc] = useState(CONTRIBUTION_CONFIG.qrImagePath);
@@ -30,16 +36,27 @@ export default function SacredContributionModal({ isOpen, onClose }) {
   const activeAmount = customAmount ? parseInt(customAmount) || 0 : selectedTier?.amount || 51;
   const upiIntentUrl = buildUpiIntentUrl({ amount: activeAmount });
 
-  // Rotating Live Social Proof Devotee Ticker
+  // Initialize and shuffle the 40+ devotee pool on mount
   useEffect(() => {
-    if (!isOpen) return;
-    const timer = setInterval(() => {
-      setTickerIndex((prev) => (prev + 1) % CONTRIBUTION_CONFIG.socialTicker.length);
-    }, 4200);
-    return () => clearInterval(timer);
-  }, [isOpen]);
+    const list = [...CONTRIBUTION_CONFIG.socialTicker];
+    // Fisher-Yates shuffle
+    for (let i = list.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+    setTickerList(list);
+  }, []);
 
-  // Load custom QR image
+  // Smooth live rotating devotee ticker (every 4.5 seconds)
+  useEffect(() => {
+    if (!isOpen || tickerList.length === 0) return;
+    const timer = setInterval(() => {
+      setTickerIndex((prev) => (prev + 1) % tickerList.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, [isOpen, tickerList.length]);
+
+  // Load custom QR image with resilient fallback
   useEffect(() => {
     if (typeof window === "undefined") return;
     const testImg = new Image();
@@ -69,12 +86,29 @@ export default function SacredContributionModal({ isOpen, onClose }) {
   // Trigger Celebratory Diya & Marigold Shower
   const handleConfirmOffering = () => {
     setIsSuccess(true);
+    const trimmedName = devoteeName.trim();
+
     if (typeof window !== "undefined") {
       localStorage.setItem("mahalaya_diya_lit", "true");
-      if (devoteeName.trim()) {
-        localStorage.setItem("mahalaya_patron_name", devoteeName.trim());
+      if (trimmedName) {
+        localStorage.setItem("mahalaya_patron_name", trimmedName);
       }
       window.dispatchEvent(new Event("diya_lit_event"));
+    }
+
+    // Dynamic Social Proof: Optimistically prepend the user's offering to the ticker!
+    if (trimmedName) {
+      setTickerList((prev) => [
+        {
+          name: trimmedName,
+          bnName: trimmedName,
+          city: "Live Devotee",
+          amount: activeAmount,
+          time: "just now",
+        },
+        ...prev,
+      ]);
+      setTickerIndex(0);
     }
 
     // Acoustic sacred energy pulse
@@ -165,9 +199,11 @@ export default function SacredContributionModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
-  const currentDevotee = CONTRIBUTION_CONFIG.socialTicker[tickerIndex];
+  const currentDevotee = tickerList[tickerIndex] || CONTRIBUTION_CONFIG.socialTicker[0];
   const shareText = encodeURIComponent(
-    `🪔 আমি মহালয়ার পবিত্র ভোরের সাউন্ডস্কেপে মা দুর্গার চরণে একটি প্রদীপ প্রজ্বলন করেছি।\n\nবীরেন্দ্রকৃষ্ণ ভদ্রের চণ্ডীপাঠ ও আকাশবাণী কলকাতা সরাসরি শুনুন:\n${typeof window !== "undefined" ? window.location.origin : "https://sudhans.vercel.app"}`
+    `🪔 আমি মহালয়ার পবিত্র ভোরের সাউন্ডস্কেপে মা দুর্গার চরণে একটি প্রদীপ প্রজ্বলন করেছি।\n\nI lit a sacred Diya on the Mahalaya dawn soundscape. Listen live (100% ad-free):\n${
+      typeof window !== "undefined" ? window.location.origin : "https://sudhans.vercel.app"
+    }`
   );
 
   return (
@@ -201,40 +237,48 @@ export default function SacredContributionModal({ isOpen, onClose }) {
 
         {!isSuccess ? (
           <div>
-            {/* Header: Sacred Diya Symbol + Emotional Resonance */}
+            {/* Header: Sacred Diya Symbol + Bilingual Cultural Resonance */}
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#2f1406] to-[#542107] border border-[#ff7b1a]/80 flex items-center justify-center shadow-[0_0_22px_rgba(255,123,26,0.55)] flex-shrink-0">
                 <span className="text-2xl animate-pulse">🪔</span>
               </div>
               <div className="pr-6">
                 <h2 id="diya-modal-title" className="text-lg sm:text-xl font-bold tracking-tight text-[#ffbe76]">
-                  {CONTRIBUTION_CONFIG.copy.headline}
+                  ভোরের আলো জ্বালিয়ে রাখুন
                 </h2>
-                <p className="text-xs text-orange-200/85 font-medium">
-                  {CONTRIBUTION_CONFIG.copy.subHeadline}
+                <p className="text-xs text-orange-200/90 font-medium">
+                  Keep the Dawn Glowing • Light a Sacred Diya
                 </p>
               </div>
             </div>
 
-            {/* Social Proof Devotee Stream (Cultural Bandwagon Effect) */}
+            {/* Social Proof Devotee Stream — Bilingual, Non-Repeating, Real Hubs */}
             <div className="mt-3 py-1.5 px-3 rounded-xl bg-orange-950/40 border border-amber-500/25 flex items-center justify-between text-[11px] text-amber-200/90 animate-fade-in">
               <div className="flex items-center gap-1.5 truncate">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping flex-shrink-0" />
                 <span className="truncate">
-                  🌸 <strong className="text-white">{currentDevotee.name}</strong> ({currentDevotee.city}) প্রদীপ জ্বালিয়েছেন
+                  🌸 <strong className="text-white">{currentDevotee.name}</strong> ({currentDevotee.city}) lit a Diya • প্রদীপ প্রজ্বলন
                 </span>
               </div>
-              <span className="font-mono text-emerald-300 font-bold ml-2 flex-shrink-0">
-                ₹{currentDevotee.amount}
-              </span>
+              <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                <span className="text-[10px] text-zinc-400 hidden xs:inline">{currentDevotee.time}</span>
+                <span className="font-mono text-emerald-300 font-bold">
+                  ₹{currentDevotee.amount}
+                </span>
+              </div>
             </div>
 
-            {/* Emotional Cultural Framing Copy */}
-            <p className="mt-3 text-xs sm:text-[12.5px] leading-relaxed text-zinc-300/90 font-sans">
-              {CONTRIBUTION_CONFIG.copy.mission}
-            </p>
+            {/* Emotional Cultural Framing Copy — Bilingual for Probashi & Resident Bengalis */}
+            <div className="mt-3 text-xs leading-relaxed text-zinc-300/90 font-sans space-y-1">
+              <p className="text-zinc-200">
+                এই ভোরের আকাশ ও বীরেন্দ্রকৃষ্ণের অমর চণ্ডীপাঠ বিশ্বজুড়ে প্রতিটি বাঙালির জন্য ১০০% বিজ্ঞাপনহীন রাখা হয়েছে।
+              </p>
+              <p className="text-[11px] text-zinc-400 leading-normal">
+                Your sacred offering (অর্ঘ্য) directly sustains live audio streaming bandwidth, soundscape engineering, and cultural heritage servers.
+              </p>
+            </div>
 
-            {/* Auspicious Shagun Tiers Grid (Ending in +1) */}
+            {/* Auspicious Shagun Tiers Grid (Ending in +1) — Never Truncates */}
             <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
               {CONTRIBUTION_CONFIG.tiers.map((tier) => {
                 const isSelected = !customAmount && selectedTier?.id === tier.id;
@@ -247,18 +291,21 @@ export default function SacredContributionModal({ isOpen, onClose }) {
                     }}
                     className={`relative p-2.5 rounded-2xl flex flex-col items-center text-center transition-all duration-200 cursor-pointer border ${
                       isSelected
-                        ? "bg-[#ff7b1a]/25 border-[#ff7b1a] shadow-[0_0_18px_rgba(255,123,26,0.45)] scale-[1.03]"
+                        ? "bg-[#ff7b1a]/25 border-[#ff7b1a] shadow-[0_0_18px_rgba(255,123,26,0.45)] scale-[1.02]"
                         : "bg-zinc-950/70 border-zinc-800/80 hover:border-orange-500/40 hover:bg-zinc-900/50"
                     }`}
                   >
                     {tier.popular && (
-                      <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[9px] font-mono font-bold uppercase tracking-wider bg-gradient-to-r from-[#ff7b1a] to-[#ffd166] text-black px-1.5 py-0.5 rounded-full shadow-[0_0_8px_#ff7b1a] whitespace-nowrap">
-                        ভক্তপ্রিয়
+                      <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[8.5px] font-mono font-bold uppercase tracking-wider bg-gradient-to-r from-[#ff7b1a] to-[#ffd166] text-black px-1.5 py-0.5 rounded-full shadow-[0_0_8px_#ff7b1a] whitespace-nowrap">
+                        ★ {tier.badge}
                       </span>
                     )}
                     <span className="text-xl mt-0.5">{tier.icon}</span>
-                    <span className="text-xs font-semibold text-zinc-100 mt-1 line-clamp-1">
+                    <span className="text-xs font-semibold text-zinc-100 mt-1 leading-tight">
                       {tier.name}
+                    </span>
+                    <span className="text-[10px] text-zinc-400 font-sans leading-tight">
+                      {tier.enName}
                     </span>
                     <span className="text-sm font-bold text-[#ffd166] font-mono mt-0.5">
                       ₹{tier.amount}
@@ -268,21 +315,21 @@ export default function SacredContributionModal({ isOpen, onClose }) {
               })}
             </div>
 
-            {/* Personalized Sankalp (Name for Blessing) */}
+            {/* Personalized Sankalp (Name for Blessing) & Custom Amount */}
             <div className="mt-3.5 flex items-center gap-2">
               <div className="relative flex-1">
                 <input
                   type="text"
-                  placeholder="আপনার বা পরিবারের নাম (ঐচ্ছিক সংকল্প)..."
+                  placeholder="Devotee / Family Name (নাম / সংকল্প)..."
                   value={devoteeName}
                   onChange={(e) => setDevoteeName(e.target.value)}
                   className="w-full px-3 py-1.5 rounded-xl bg-zinc-950/80 border border-zinc-800 focus:border-amber-500/80 text-xs text-zinc-200 placeholder-zinc-500 outline-none transition-colors"
                 />
               </div>
-              <div className="w-24">
+              <div className="w-28">
                 <input
                   type="number"
-                  placeholder="অন্য অঙ্ক ₹"
+                  placeholder="₹ Custom (অন্যান্য)"
                   value={customAmount}
                   onChange={(e) => setCustomAmount(e.target.value)}
                   className="w-full px-2.5 py-1.5 rounded-xl bg-zinc-950/80 border border-zinc-800 focus:border-amber-500/80 text-xs font-mono text-amber-300 placeholder-zinc-500 outline-none transition-colors"
@@ -323,7 +370,7 @@ export default function SacredContributionModal({ isOpen, onClose }) {
                 </div>
 
                 <div className="text-xs text-orange-200 mt-1">
-                  প্রাপক: <strong className="text-white">{CONTRIBUTION_CONFIG.payeeName}</strong>
+                  Payee / প্রাপক: <strong className="text-white">{CONTRIBUTION_CONFIG.payeeName}</strong>
                 </div>
 
                 {/* Copyable Official Kotak Bank UPI ID */}
@@ -347,7 +394,7 @@ export default function SacredContributionModal({ isOpen, onClose }) {
                   rel="noopener noreferrer"
                   className="mt-2.5 inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#ff7b1a] via-[#ffa502] to-[#ffd166] hover:brightness-110 text-black font-bold text-xs tracking-wide shadow-[0_0_18px_rgba(255,123,26,0.6)] active:scale-95 transition-all text-center"
                 >
-                  <span>⚡ সরাসরি UPI অ্যাপে পাঠান (₹{activeAmount})</span>
+                  <span>⚡ Pay ₹{activeAmount} via UPI App (সরাসরি পাঠান)</span>
                 </a>
 
                 <div className="text-[10px] text-zinc-400 mt-1.5">
@@ -362,7 +409,7 @@ export default function SacredContributionModal({ isOpen, onClose }) {
                 onClick={handleConfirmOffering}
                 className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#2f1406] to-[#4a1c07] hover:from-[#3f1b08] hover:to-[#5e2309] border border-[#ff7b1a] text-[#ffd166] hover:text-white font-semibold text-xs sm:text-sm tracking-wide shadow-[0_0_20px_rgba(255,123,26,0.35)] active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
               >
-                <span>✨ আমি প্রদীপ অর্পণ করেছি (Confirm My Diya)</span>
+                <span>✨ I Have Offered My Diya (অর্ঘ্য সম্পন্ন করেছি)</span>
               </button>
             </div>
           </div>
@@ -375,17 +422,21 @@ export default function SacredContributionModal({ isOpen, onClose }) {
             <h3 className="mt-4 text-xl font-bold text-[#ffd166]">
               {CONTRIBUTION_CONFIG.copy.gratitudeTitle}
             </h3>
+            <p className="text-xs text-orange-200/90 font-medium">
+              {CONTRIBUTION_CONFIG.copy.gratitudeTitleEn}
+            </p>
 
             {/* Personalized Devotee Name Blessing */}
             {devoteeName.trim() && (
-              <div className="mt-2 inline-block px-3 py-1 rounded-full bg-orange-950/60 border border-orange-500/40 text-xs font-medium text-amber-200">
-                শ্রী/শ্রীমতী <strong>{devoteeName.trim()}</strong> ও পরিবার
+              <div className="mt-2.5 inline-block px-3 py-1 rounded-full bg-orange-950/60 border border-orange-500/40 text-xs font-medium text-amber-200">
+                শ্রী/শ্রীমতী <strong>{devoteeName.trim()}</strong> & Family
               </div>
             )}
 
-            <p className="mt-2.5 text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-sm mx-auto font-sans">
-              {CONTRIBUTION_CONFIG.copy.gratitudeMessage}
-            </p>
+            <div className="mt-2.5 text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-sm mx-auto font-sans space-y-1">
+              <p>{CONTRIBUTION_CONFIG.copy.gratitudeMessageBn}</p>
+              <p className="text-[11px] text-zinc-400">{CONTRIBUTION_CONFIG.copy.gratitudeMessageEn}</p>
+            </div>
 
             {/* Viral WhatsApp Festive Sharing Loop */}
             <div className="mt-4 flex flex-col gap-2">
@@ -395,14 +446,14 @@ export default function SacredContributionModal({ isOpen, onClose }) {
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-black font-bold text-xs tracking-wide shadow-[0_0_16px_rgba(37,211,102,0.4)] active:scale-95 transition-all"
               >
-                <span>💬 পরিবার ও বন্ধুদের সাথে আশীর্বাদ শেয়ার করুন</span>
+                <span>💬 Share Blessing on WhatsApp (পরিবারে শেয়ার করুন)</span>
               </a>
 
               <button
                 onClick={onClose}
                 className="mt-1 px-6 py-2 rounded-xl bg-[#ff7b1a] text-black font-bold text-xs tracking-wider shadow-[0_0_20px_rgba(255,123,26,0.6)] hover:brightness-110 active:scale-95 transition-all cursor-pointer"
               >
-                পবিত্র সাউন্ডস্কেপে ফিরে যান (Return)
+                Return to Soundscape (ফিরে যান)
               </button>
             </div>
           </div>

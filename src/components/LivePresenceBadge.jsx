@@ -164,18 +164,18 @@ export default function LivePresenceBadge() {
             </div>
 
             <div className="flex items-center justify-between text-[11px] py-1 px-2 rounded-lg bg-zinc-900/60 border border-zinc-800/50">
-              <span className="text-zinc-300">🏛️ Kolkata & West Bengal</span>
-              <span className="font-mono text-emerald-300 font-medium">54%</span>
+              <span className="text-zinc-300">🏛️ Kolkata & Bengal Core</span>
+              <span className="font-mono text-emerald-300 font-medium">56%</span>
             </div>
 
             <div className="flex items-center justify-between text-[11px] py-1 px-2 rounded-lg bg-zinc-900/60 border border-zinc-800/50">
-              <span className="text-zinc-300">🌊 Dhaka & Bangladesh</span>
+              <span className="text-zinc-300">🇮🇳 Bengaluru, Delhi NCR & Metros</span>
               <span className="font-mono text-emerald-300 font-medium">28%</span>
             </div>
 
             <div className="flex items-center justify-between text-[11px] py-1 px-2 rounded-lg bg-zinc-900/60 border border-zinc-800/50">
-              <span className="text-zinc-300">🌏 Worldwide Diaspora</span>
-              <span className="font-mono text-emerald-300 font-medium">18%</span>
+              <span className="text-zinc-300">🌏 Global Diaspora (USA, UK, Canada)</span>
+              <span className="font-mono text-emerald-300 font-medium">16%</span>
             </div>
           </div>
 
